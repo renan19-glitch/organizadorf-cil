@@ -8,7 +8,7 @@ import { supabaseService } from './services';
 import { useAuth, useBills } from './hooks';
 import { AuthContext, BillsContext } from './contexts';
 import {
-    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon
+    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon, HotmartWordmark
 } from './components';
 import SubscribePage from './src/pages/SubscribePage';
 
@@ -807,9 +807,9 @@ const SubscriptionPage: React.FC = () => {
     const displayInfo = statusDisplay[currentStatusKey] || statusDisplay.default;
     const formattedNextBilling = formatDate(user.next_billing_date);
 
-    const InfoRow: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
+    const InfoRow: React.FC<{ label: React.ReactNode; value: React.ReactNode }> = ({ label, value }) => (
         <div className="space-y-1">
-            <p className="text-sm text-slate-500">{label}</p>
+            <div className="text-sm text-slate-500 flex items-center">{label}</div>
             <div className="font-semibold text-slate-800 text-lg">{value}</div>
         </div>
     );
@@ -827,18 +827,23 @@ const SubscriptionPage: React.FC = () => {
 
             <Section icon={<StarIcon className="h-7 w-7" />} title="Dados da Assinatura">
                 <div className="space-y-4">
-                    <InfoRow label="ID do Assinante" value={user.subscriber_id || 'Não informado'} />
+                    <InfoRow 
+                        label={
+                            <>
+                                <HotmartWordmark className="h-4 mr-2" />
+                                <span>ID do Assinante</span>
+                            </>
+                        } 
+                        value={user.subscriber_id || 'Não informado'} 
+                    />
                     <InfoRow label="Plano" value={user.plan_name || 'Não informado'} />
                     <InfoRow label="Próximo Vencimento" value={formattedNextBilling} />
                     <InfoRow 
                         label="Status" 
                         value={
-                            <div className="flex items-center">
-                                <HotmartIcon className={`h-5 w-5 mr-2 ${displayInfo.textColor}`} />
-                                <span className={`px-3 py-1 text-sm font-bold rounded-full ${displayInfo.bgColor} ${displayInfo.textColor}`}>
-                                    {displayInfo.text}
-                                </span>
-                            </div>
+                            <span className={`px-3 py-1 text-sm font-bold rounded-full ${displayInfo.bgColor} ${displayInfo.textColor}`}>
+                                {displayInfo.text}
+                            </span>
                         } 
                     />
                 </div>
