@@ -706,16 +706,21 @@ const BillsListPage: React.FC = () => {
                 </div>
             </div>
             {loading ? <Spinner /> : (
-                <div className="space-y-3">
-                    {sortedAndFilteredBills.length > 0 ? sortedAndFilteredBills.map(bill => (
-                        <BillItem key={bill.id} bill={bill} onTogglePaid={togglePaid} onEdit={handleEdit} onDelete={handleDelete} onViewDetails={setBillToView} />
-                    )) : (
-                        <div className="text-center text-slate-500 mt-12 py-8 bg-slate-50 rounded-lg">
-                            <DocumentTextIcon className="h-12 w-12 mx-auto text-slate-400 mb-4" />
-                            <p className="font-semibold">Nenhuma conta encontrada.</p>
-                            <p className="text-sm">Tente ajustar os filtros ou adicione uma nova conta.</p>
-                        </div>
-                    )}
+                <div>
+                    <div className="mb-4 text-sm text-slate-600 font-medium">
+                        {sortedAndFilteredBills.length} conta{sortedAndFilteredBills.length !== 1 ? 's' : ''} encontrada{sortedAndFilteredBills.length !== 1 ? 's' : ''}.
+                    </div>
+                    <div className="space-y-3">
+                        {sortedAndFilteredBills.length > 0 ? sortedAndFilteredBills.map(bill => (
+                            <BillItem key={bill.id} bill={bill} onTogglePaid={togglePaid} onEdit={handleEdit} onDelete={handleDelete} onViewDetails={setBillToView} />
+                        )) : (
+                            <div className="text-center text-slate-500 mt-12 py-8 bg-slate-50 rounded-lg">
+                                <DocumentTextIcon className="h-12 w-12 mx-auto text-slate-400 mb-4" />
+                                <p className="font-semibold">Nenhuma conta encontrada.</p>
+                                <p className="text-sm">Tente ajustar os filtros ou adicione uma nova conta.</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
             <button
