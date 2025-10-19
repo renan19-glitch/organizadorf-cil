@@ -12,6 +12,23 @@ import {
 } from './components';
 import SubscribePage from './src/pages/SubscribePage';
 
+const translateSupabaseError = (message?: string): string => {
+    if (!message) return 'Ocorreu um erro desconhecido.';
+    
+    const translations: { [key: string]: string } = {
+        'Invalid login credentials': 'E-mail ou senha inválidos.',
+        'User not found': 'Usuário não encontrado.',
+        'Password should be at least 6 characters': 'A senha deve ter no mínimo 6 caracteres.',
+        'User already registered': 'Este e-mail já está cadastrado.',
+        'Unable to validate email address: invalid format': 'O formato do e-mail é inválido.',
+        'For security purposes, you can only request this once every 60 seconds': 'Por segurança, você só pode fazer esta solicitação a cada 60 segundos.',
+    };
+    
+    const errorKey = Object.keys(translations).find(key => message.includes(key));
+    
+    return errorKey ? translations[errorKey] : 'Ocorreu um erro inesperado. Tente novamente.';
+};
+
 // --- PROVIDERS ---
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
@@ -379,16 +396,20 @@ const ForgotPasswordPage: React.FC = () => {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    const [isError, setIsError] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setMessage('');
+        setIsError(false);
         const { error } = await supabaseService.resetPasswordWithTemporary(email);
         if (error) {
-            setMessage('Ocorreu um erro. Tente novamente.');
+            setMessage(translateSupabaseError(error.message));
+            setIsError(true);
         } else {
-            setMessage("Se uma conta com este e-mail existir, sua senha foi redefinida para 'pague123'.");
+            setMessage("Se uma conta com este e-mail existir, sua senha foi redefinida para 'pague123'. Faça o login para continuar.");
+            setIsError(false);
         }
         setLoading(false);
     };
@@ -416,7 +437,7 @@ const ForgotPasswordPage: React.FC = () => {
                             {loading ? 'Redefinindo...' : 'Redefinir Senha'}
                         </Button>
                     </form>
-                    {message && <p className="mt-4 text-center text-sm text-green-600">{message}</p>}
+                    {message && <p className={`mt-4 text-center text-sm ${isError ? 'text-red-600' : 'text-green-600'}`}>{message}</p>}
                     <div className="text-center mt-4">
                         <Link to="/login" className="text-sm text-indigo-600 hover:underline">
                             Voltar para o login
@@ -926,12 +947,15 @@ const ProfilePage: React.FC = () => {
         setIsUpdatingPassword(false);
 
         if (error) {
-            setPasswordMessage({ type: 'error', text: `Erro de comunicação: ${error.message}` });
+            setPasswordMessage({ type: 'error', text: translateSupabaseError(error.message) });
         } else if (data && !data.success) {
-            setPasswordMessage({ type: 'error', text: data.error || 'Ocorreu um erro desconhecido.' });
+            setPasswordMessage({ type: 'error', text: translateSupabaseError(data.error) });
         } else if (data && data.success) {
-            setPasswordMessage({ type: 'success', text: 'Senha alterada. Você será desconectado...' });
-            await forceRevalidate();
+            setPasswordMessage({ type: 'success', text: 'Senha alterada com sucesso! Você será desconectado para fazer login novamente.' });
+            setTimeout(() => {
+                signOut();
+                navigate('/login?message=password-updated');
+            }, 3000);
         } else {
             setPasswordMessage({ type: 'error', text: 'A resposta do servidor foi inesperada.' });
         }
