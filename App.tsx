@@ -531,6 +531,7 @@ const BillsListPage: React.FC = () => {
     const navigate = useNavigate();
     const [filter, setFilter] = useState('all');
     const [billToDelete, setBillToDelete] = useState<Bill | null>(null);
+    const [billToView, setBillToView] = useState<Bill | null>(null);
 
     const handleEdit = (id: string) => {
         navigate(`/edit-bill/${id}`);
@@ -577,7 +578,7 @@ const BillsListPage: React.FC = () => {
             {loading ? <Spinner /> : (
                 <div className="space-y-3">
                     {sortedAndFilteredBills.length > 0 ? sortedAndFilteredBills.map(bill => (
-                        <BillItem key={bill.id} bill={bill} onTogglePaid={togglePaid} onEdit={handleEdit} onDelete={handleDelete} />
+                        <BillItem key={bill.id} bill={bill} onTogglePaid={togglePaid} onEdit={handleEdit} onDelete={handleDelete} onViewDetails={setBillToView} />
                     )) : (
                         <div className="text-center text-slate-500 mt-12 py-8 bg-slate-50 rounded-lg">
                             <DocumentTextIcon className="h-12 w-12 mx-auto text-slate-400 mb-4" />
@@ -602,6 +603,39 @@ const BillsListPage: React.FC = () => {
                     <Button variant="secondary" onClick={() => setBillToDelete(null)}>Cancelar</Button>
                     <Button variant="danger" onClick={confirmDelete}>Excluir</Button>
                 </div>
+            </Modal>
+            <Modal isOpen={!!billToView} onClose={() => setBillToView(null)} title="Detalhes da Conta">
+                {billToView && (
+                    <div className="space-y-4 text-slate-700">
+                        <div className="pb-2 border-b">
+                            <p className="text-xs text-slate-500">Nome da Conta</p>
+                            <p className="font-bold text-xl text-slate-800">{billToView.name}</p>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-xs text-slate-500">Valor</p>
+                                <p className="font-semibold text-lg">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(billToView.value)}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-slate-500">Vencimento</p>
+                                <p className="font-semibold text-lg">{new Date(billToView.dueDate).toLocaleDateString('pt-BR')}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-500">Categoria</p>
+                            <p className="font-semibold text-lg">{billToView.category}</p>
+                        </div>
+                        {billToView.observations && (
+                            <div>
+                                <p className="text-xs text-slate-500">Observações</p>
+                                <p className="text-base bg-slate-50 p-3 rounded-md whitespace-pre-wrap">{billToView.observations}</p>
+                            </div>
+                        )}
+                        <div className="flex justify-end pt-4">
+                            <Button variant="secondary" onClick={() => setBillToView(null)}>Fechar</Button>
+                        </div>
+                    </div>
+                )}
             </Modal>
         </div>
     );

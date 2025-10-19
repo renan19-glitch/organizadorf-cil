@@ -266,9 +266,10 @@ interface BillItemProps {
   onTogglePaid: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (bill: Bill) => void;
+  onViewDetails: (bill: Bill) => void;
 }
 
-export const BillItem: React.FC<BillItemProps> = ({ bill, onTogglePaid, onEdit, onDelete }) => {
+export const BillItem: React.FC<BillItemProps> = ({ bill, onTogglePaid, onEdit, onDelete, onViewDetails }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -310,7 +311,7 @@ export const BillItem: React.FC<BillItemProps> = ({ bill, onTogglePaid, onEdit, 
 
   return (
     <div className={`bg-white p-4 rounded-lg shadow-sm border border-slate-200/80 flex items-center justify-between transition-all duration-300 ${bill.isPaid ? 'opacity-60 bg-slate-50' : ''}`}>
-      <div className="flex items-center flex-grow">
+      <div className="flex items-center flex-grow cursor-pointer" onClick={() => onViewDetails(bill)}>
         <div className={`w-2 h-16 rounded-full ${statusInfo[status].color} mr-4 flex-shrink-0`}></div>
         <div className="flex-grow">
           <p className={`font-bold text-lg ${bill.isPaid ? 'line-through text-slate-500' : 'text-slate-800'}`}>{bill.name}</p>
