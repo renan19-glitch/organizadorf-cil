@@ -950,9 +950,9 @@ const ProfilePage: React.FC = () => {
             setPasswordMessage({ type: 'error', text: translateSupabaseError(data.error) });
         } else if (data && data.success) {
             setPasswordMessage({ type: 'success', text: 'Senha alterada com sucesso! Você será desconectado para fazer login novamente.' });
-            setTimeout(() => {
-                signOut();
-                navigate('/login?message=password-updated');
+            setTimeout(async () => {
+                await signOut();
+                navigate('/login?message=password-updated', { replace: true });
             }, 3000);
         } else {
             setPasswordMessage({ type: 'error', text: 'A resposta do servidor foi inesperada.' });
