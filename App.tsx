@@ -331,20 +331,20 @@ const LoginPage: React.FC = () => {
                         localization={{
                             variables: {
                                 sign_in: {
-                                    email_label: 'Seu email',
-                                    password_label: 'Sua senha',
-                                    email_input_placeholder: 'seu@email.com',
-                                    password_input_placeholder: 'Sua senha',
+                                    email_label: 'E-mail',
+                                    password_label: 'Senha',
+                                    email_input_placeholder: 'Digite seu e-mail',
+                                    password_input_placeholder: 'Digite sua senha',
                                     button_label: 'Entrar',
                                     social_provider_text: 'Entrar com {{provider}}',
                                     link_text: '',
                                     forgotten_password_link_text: '',
                                 },
                                 sign_up: {
-                                    email_label: 'Seu email',
-                                    password_label: 'Sua senha',
-                                    email_input_placeholder: 'seu@email.com',
-                                    password_input_placeholder: 'Crie uma senha',
+                                    email_label: 'E-mail',
+                                    password_label: 'Senha',
+                                    email_input_placeholder: 'Digite seu e-mail',
+                                    password_input_placeholder: 'Crie sua senha',
                                     button_label: 'Cadastrar',
                                     social_provider_text: 'Cadastrar com {{provider}}',
                                     link_text: '',
