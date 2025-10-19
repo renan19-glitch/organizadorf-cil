@@ -8,7 +8,7 @@ import { supabaseService } from './services';
 import { useAuth, useBills } from './hooks';
 import { AuthContext, BillsContext } from './contexts';
 import {
-    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon
+    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon
 } from './components';
 import SubscribePage from './src/pages/SubscribePage';
 
@@ -808,7 +808,7 @@ const SubscriptionPage: React.FC = () => {
     const formattedNextBilling = formatDate(user.next_billing_date);
 
     const InfoRow: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
-        <div>
+        <div className="space-y-1">
             <p className="text-sm text-slate-500">{label}</p>
             <div className="font-semibold text-slate-800 text-lg">{value}</div>
         </div>
@@ -817,39 +817,39 @@ const SubscriptionPage: React.FC = () => {
     return (
         <div>
             <Header title="Minha Assinatura" />
-            <div className="space-y-6">
-                <Card>
-                    <h2 className="text-xl font-bold text-slate-800 mb-4 border-b pb-2">Informações Pessoais</h2>
-                    <div className="space-y-4 pt-2">
-                        <InfoRow label="Nome" value={user.name} />
-                        <InfoRow label="Email" value={user.email} />
-                    </div>
-                </Card>
+            
+            <Section icon={<UserCircleIcon className="h-7 w-7" />} title="Informações do Assinante">
+                <div className="space-y-4">
+                    <InfoRow label="Nome" value={user.name} />
+                    <InfoRow label="Email" value={user.email} />
+                </div>
+            </Section>
 
-                <Card>
-                    <h2 className="text-xl font-bold text-slate-800 mb-4 border-b pb-2">Dados da Assinatura</h2>
-                    <div className="space-y-4 pt-2">
-                        <InfoRow label="ID do Assinante" value={user.subscriber_id || 'Não informado'} />
-                        <InfoRow label="Plano" value={user.plan_name || 'Não informado'} />
-                        <InfoRow label="Próximo Vencimento" value={formattedNextBilling} />
-                        <InfoRow 
-                            label="Status" 
-                            value={
+            <Section icon={<StarIcon className="h-7 w-7" />} title="Dados da Assinatura">
+                <div className="space-y-4">
+                    <InfoRow label="ID do Assinante" value={user.subscriber_id || 'Não informado'} />
+                    <InfoRow label="Plano" value={user.plan_name || 'Não informado'} />
+                    <InfoRow label="Próximo Vencimento" value={formattedNextBilling} />
+                    <InfoRow 
+                        label="Status" 
+                        value={
+                            <div className="flex items-center">
+                                <HotmartIcon className={`h-5 w-5 mr-2 ${displayInfo.textColor}`} />
                                 <span className={`px-3 py-1 text-sm font-bold rounded-full ${displayInfo.bgColor} ${displayInfo.textColor}`}>
                                     {displayInfo.text}
                                 </span>
-                            } 
-                        />
+                            </div>
+                        } 
+                    />
+                </div>
+                {user.subscription_status !== 'active' && (
+                    <div className="mt-6 pt-6 border-t border-slate-200">
+                         <Button onClick={() => navigate('/subscribe')}>
+                            Fazer Upgrade ou Alterar Plano
+                        </Button>
                     </div>
-                    {user.subscription_status !== 'active' && (
-                        <div className="mt-6 pt-4 border-t">
-                             <Button onClick={() => navigate('/subscribe')}>
-                                Fazer Upgrade ou Alterar Plano
-                            </Button>
-                        </div>
-                    )}
-                </Card>
-            </div>
+                )}
+            </Section>
         </div>
     );
 };

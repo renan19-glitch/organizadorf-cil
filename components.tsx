@@ -109,6 +109,12 @@ export const ArrowRightOnRectangleIcon = ({ className }: { className?: string })
     </svg>
 );
 
+export const HotmartIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" className={className || "h-6 w-6"} fill="currentColor">
+        <path d="M128 24a104 104 0 1 0 104 104A104.11 104.11 0 0 0 128 24Zm-32.29 112.43a12 12 0 0 1-17.42 16.28l-1.5-1.61a12 12 0 0 1 16.28-17.42l1.5 1.61a12 12 0 0 1 1.14 1.14Zm17.4-49.31a12 12 0 0 1 10.69-1.45l1.56.52a12 12 0 0 1-9.24 22.37l-1.56-.52a12 12 0 0 1-1.45-21.92Zm34.18 13.16a12 12 0 0 1 17.42 16.28l-1.5 1.61a12 12 0 0 1-16.28-17.42l1.5-1.61a12 12 0 0 1-1.14-1.14Zm-16.28-17.42a12 12 0 0 1 16.28 17.42l-1.61 1.5a12 12 0 0 1-17.42-16.28l1.61-1.5a12 12 0 0 1 1.14-1.14Zm32.56 34.84a12 12 0 0 1 1.14 1.14l-1.5 1.61a12 12 0 0 1-16.28 17.42l-1.5-1.61a12 12 0 0 1 17.42-16.28l.72-.76Zm-69.13 34.84a12 12 0 0 1 1.14 1.14l-1.5 1.61a12 12 0 0 1-16.28 17.42l-1.5-1.61a12 12 0 0 1 17.42-16.28l.72-.76Z"/>
+    </svg>
+);
+
 
 // --- UI COMPONENTS ---
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
