@@ -828,12 +828,7 @@ const SubscriptionPage: React.FC = () => {
             <Section icon={<StarIcon className="h-7 w-7" />} title="Dados da Assinatura">
                 <div className="space-y-4">
                     <InfoRow 
-                        label={
-                            <>
-                                <HotmartWordmark className="h-4 mr-2" />
-                                <span>ID do Assinante</span>
-                            </>
-                        } 
+                        label="ID do Assinante"
                         value={user.subscriber_id || 'Não informado'} 
                     />
                     <InfoRow label="Plano" value={user.plan_name || 'Não informado'} />
