@@ -93,6 +93,16 @@ export const BellIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
+export const AnimatedBellIcon = ({ className }: { className?: string }) => (
+    <BellIcon className={`animate-wiggle ${className}`} />
+);
+
+export const CheckCircleIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className || "w-6 h-6"}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+);
+
 export const ArrowRightOnRectangleIcon = ({ className }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className || "w-6 h-6"}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
@@ -225,6 +235,27 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ checked, onChange })
 };
 
 // --- APP-SPECIFIC COMPONENTS ---
+
+interface NotificationBannerProps {
+    variant: 'danger' | 'warning' | 'success';
+    icon: React.ReactNode;
+    children: React.ReactNode;
+}
+
+export const NotificationBanner: React.FC<NotificationBannerProps> = ({ variant, icon, children }) => {
+    const variantClasses = {
+        danger: 'bg-red-100 text-red-800',
+        warning: 'bg-yellow-100 text-yellow-800',
+        success: 'bg-emerald-100 text-emerald-800',
+    };
+
+    return (
+        <div className={`flex items-center p-4 mb-6 rounded-lg shadow-sm ${variantClasses[variant]}`}>
+            <div className="flex-shrink-0 mr-3">{icon}</div>
+            <div className="text-sm font-semibold">{children}</div>
+        </div>
+    );
+};
 
 interface SummaryCardProps {
     title: string;

@@ -8,7 +8,7 @@ import { supabaseService } from './services';
 import { useAuth, useBills } from './hooks';
 import { AuthContext, BillsContext } from './contexts';
 import {
-    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch
+    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon
 } from './components';
 import SubscribePage from './src/pages/SubscribePage';
 
@@ -511,12 +511,35 @@ const HomePage: React.FC = () => {
     
     const displayName = user?.name ? user.name.split(' ')[0] : 'Usuário';
 
+    const renderNotification = () => {
+        if (overdue.length > 0) {
+            return (
+                <NotificationBanner variant="danger" icon={<AnimatedBellIcon className="h-6 w-6" />}>
+                    Você tem <strong>{overdue.length} conta(s) vencida(s)</strong>.
+                </NotificationBanner>
+            );
+        }
+        if (dueToday.length > 0) {
+            return (
+                <NotificationBanner variant="warning" icon={<AnimatedBellIcon className="h-6 w-6" />}>
+                    Você tem <strong>{dueToday.length} conta(s) vencendo hoje</strong>.
+                </NotificationBanner>
+            );
+        }
+        return (
+            <NotificationBanner variant="success" icon={<CheckCircleIcon className="h-6 w-6" />}>
+                Suas contas estão em dia! Parabéns!
+            </NotificationBanner>
+        );
+    };
+
     return (
         <div>
-            <header className="mb-8">
+            <header className="mb-4">
                 <h1 className="text-3xl font-bold text-slate-800">Olá, {displayName}!</h1>
                 <p className="text-slate-500 mt-1">Aqui está o resumo de suas contas.</p>
             </header>
+            {renderNotification()}
             <div className="space-y-4">
                 <SummaryCard title="Vencidas" amount={overdue.length} value={total(overdue)} color="red" icon={<ClockIcon className="h-6 w-6" />} />
                 <SummaryCard title="Vencendo Hoje" amount={dueToday.length} value={total(dueToday)} color="yellow" icon={<CalendarIcon className="h-6 w-6" />} />
