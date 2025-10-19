@@ -333,6 +333,8 @@ const LoginPage: React.FC = () => {
                                 sign_in: {
                                     email_label: 'Seu email',
                                     password_label: 'Sua senha',
+                                    email_input_placeholder: 'seu@email.com',
+                                    password_input_placeholder: 'Sua senha',
                                     button_label: 'Entrar',
                                     social_provider_text: 'Entrar com {{provider}}',
                                     link_text: '',
@@ -341,6 +343,8 @@ const LoginPage: React.FC = () => {
                                 sign_up: {
                                     email_label: 'Seu email',
                                     password_label: 'Sua senha',
+                                    email_input_placeholder: 'seu@email.com',
+                                    password_input_placeholder: 'Crie uma senha',
                                     button_label: 'Cadastrar',
                                     social_provider_text: 'Cadastrar com {{provider}}',
                                     link_text: '',
