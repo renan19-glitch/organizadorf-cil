@@ -584,9 +584,13 @@ const HomePage: React.FC = () => {
 const BillsListPage: React.FC = () => {
     const { bills, loading, togglePaid, deleteBill } = useBills();
     const navigate = useNavigate();
-    const [filter, setFilter] = useState('all');
+    const [statusFilter, setStatusFilter] = useState('all');
+    const [categoryFilter, setCategoryFilter] = useState('all');
+    const [periodFilter, setPeriodFilter] = useState('all');
     const [billToDelete, setBillToDelete] = useState<Bill | null>(null);
     const [billToView, setBillToView] = useState<Bill | null>(null);
+
+    const categories = ['Casa', 'Internet', 'Cartão', 'Educação', 'Outros'];
 
     const handleEdit = (id: string) => {
         navigate(`/edit-bill/${id}`);
@@ -605,12 +609,35 @@ const BillsListPage: React.FC = () => {
 
     const sortedAndFilteredBills = [...bills]
         .filter(bill => {
-            if (filter === 'paid') return bill.isPaid;
-            if (filter === 'unpaid') return !bill.isPaid;
+            if (statusFilter === 'paid') return bill.isPaid;
+            if (statusFilter === 'unpaid') return !bill.isPaid;
+            return true;
+        })
+        .filter(bill => {
+            if (categoryFilter === 'all') return true;
+            return bill.category === categoryFilter;
+        })
+        .filter(bill => {
+            if (periodFilter === 'all') return true;
+            
+            const today = new Date();
+            const billDate = new Date(bill.dueDate);
+
+            if (periodFilter === 'this_month') {
+                return billDate.getMonth() === today.getMonth() && billDate.getFullYear() === today.getFullYear();
+            }
+            if (periodFilter === 'last_month') {
+                const lastMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                return billDate.getMonth() === lastMonthDate.getMonth() && billDate.getFullYear() === lastMonthDate.getFullYear();
+            }
+            if (periodFilter === 'next_month') {
+                const nextMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+                return billDate.getMonth() === nextMonthDate.getMonth() && billDate.getFullYear() === nextMonthDate.getFullYear();
+            }
             return true;
         })
         .sort((a, b) => {
-            if (filter === 'all' && a.isPaid !== b.isPaid) {
+            if (statusFilter === 'all' && a.isPaid !== b.isPaid) {
                 return a.isPaid ? 1 : -1;
             }
             if (!a.isPaid) {
@@ -625,10 +652,24 @@ const BillsListPage: React.FC = () => {
     return (
         <div>
             <Header title="Minhas Contas" />
-             <div className="flex space-x-2 mb-6">
-                <button onClick={() => setFilter('all')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${filter === 'all' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>Todas</button>
-                <button onClick={() => setFilter('unpaid')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${filter === 'unpaid' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>Abertas</button>
-                <button onClick={() => setFilter('paid')} className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${filter === 'paid' ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}>Pagas</button>
+            <div className="mb-6 space-y-4 p-4 bg-slate-50 rounded-lg border border-slate-200/80">
+                <div className="grid grid-cols-3 gap-2">
+                    <button onClick={() => setStatusFilter('all')} className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${statusFilter === 'all' ? 'bg-indigo-600 text-white shadow' : 'bg-white text-slate-700 hover:bg-slate-100 border'}`}>Todas</button>
+                    <button onClick={() => setStatusFilter('unpaid')} className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${statusFilter === 'unpaid' ? 'bg-indigo-600 text-white shadow' : 'bg-white text-slate-700 hover:bg-slate-100 border'}`}>Abertas</button>
+                    <button onClick={() => setStatusFilter('paid')} className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${statusFilter === 'paid' ? 'bg-indigo-600 text-white shadow' : 'bg-white text-slate-700 hover:bg-slate-100 border'}`}>Pagas</button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <Select label="Filtrar por Categoria" value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
+                        <option value="all">Todas as Categorias</option>
+                        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                    </Select>
+                    <Select label="Filtrar por Período" value={periodFilter} onChange={e => setPeriodFilter(e.target.value)}>
+                        <option value="all">Todos os Períodos</option>
+                        <option value="this_month">Este Mês</option>
+                        <option value="last_month">Mês Passado</option>
+                        <option value="next_month">Próximo Mês</option>
+                    </Select>
+                </div>
             </div>
             {loading ? <Spinner /> : (
                 <div className="space-y-3">
@@ -638,7 +679,7 @@ const BillsListPage: React.FC = () => {
                         <div className="text-center text-slate-500 mt-12 py-8 bg-slate-50 rounded-lg">
                             <DocumentTextIcon className="h-12 w-12 mx-auto text-slate-400 mb-4" />
                             <p className="font-semibold">Nenhuma conta encontrada.</p>
-                            <p className="text-sm">Adicione uma nova conta no botão +</p>
+                            <p className="text-sm">Tente ajustar os filtros ou adicione uma nova conta.</p>
                         </div>
                     )}
                 </div>
