@@ -8,7 +8,7 @@ export const supabaseService = {
     return supabase.auth.signInWithPassword({ email, password });
   },
   signOut: () => {
-    return supabase.auth.signOut();
+    return supabase.auth.signOut({ scope: 'global' });
   },
   onAuthStateChange: (callback: (event: string, session: any) => void) => {
     return supabase.auth.onAuthStateChange(callback);
