@@ -15,16 +15,21 @@ import SubscribePage from './src/pages/SubscribePage';
 const translateSupabaseError = (message?: string): string => {
     if (!message) return 'Ocorreu um erro desconhecido.';
     
+    const lowerCaseMessage = message.toLowerCase();
+    
     const translations: { [key: string]: string } = {
-        'Invalid login credentials': 'E-mail ou senha inválidos.',
-        'User not found': 'Usuário não encontrado.',
-        'Password should be at least 6 characters': 'A senha deve ter no mínimo 6 caracteres.',
-        'User already registered': 'Este e-mail já está cadastrado.',
-        'Unable to validate email address: invalid format': 'O formato do e-mail é inválido.',
-        'For security purposes, you can only request this once every 60 seconds': 'Por segurança, você só pode fazer esta solicitação a cada 60 segundos.',
+        'invalid login credentials': 'E-mail ou senha inválidos.',
+        'user not found': 'Usuário não encontrado.',
+        'password should be at least 6 characters': 'A senha deve ter no mínimo 6 caracteres.',
+        'user already registered': 'Este e-mail já está cadastrado.',
+        'unable to validate email address: invalid format': 'O formato do e-mail é inválido.',
+        'for security purposes, you can only request this once every 60 seconds': 'Por segurança, você só pode fazer esta solicitação a cada 60 segundos.',
+        'email not confirmed': 'Por favor, confirme seu e-mail antes de fazer o login.',
+        'missing email': 'É necessário informar um e-mail.',
+        'email is required': 'O campo de e-mail é obrigatório.',
     };
     
-    const errorKey = Object.keys(translations).find(key => message.includes(key));
+    const errorKey = Object.keys(translations).find(key => lowerCaseMessage.includes(key));
     
     return errorKey ? translations[errorKey] : 'Ocorreu um erro inesperado. Tente novamente.';
 };
@@ -298,6 +303,11 @@ const LoginPage: React.FC = () => {
     const { user } = useAuth();
     const [searchParams] = useSearchParams();
     const [message, setMessage] = useState('');
+    
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         if (user) {
@@ -310,6 +320,20 @@ const LoginPage: React.FC = () => {
             setMessage('Sua senha foi alterada com sucesso! Por favor, faça o login novamente.');
         }
     }, [searchParams]);
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        
+        const { error: signInError } = await supabaseService.signIn({ email, password });
+
+        if (signInError) {
+            setError(translateSupabaseError(signInError.message));
+        }
+        
+        setLoading(false);
+    };
 
     return (
         <AppContainer>
@@ -327,60 +351,34 @@ const LoginPage: React.FC = () => {
                     <p className="text-center text-slate-600 mb-6 text-sm">
                         Comprou pela Hotmart? Use o link "Esqueceu sua senha?" para criar seu primeiro acesso.
                     </p>
-                    <Auth
-                        supabaseClient={supabase}
-                        appearance={{ 
-                            theme: ThemeSupa,
-                            variables: {
-                                default: {
-                                    colors: {
-                                        brand: 'rgb(79 70 229)',
-                                        brandAccent: 'rgb(99 102 241)',
-                                    },
-                                    radii: {
-                                        borderRadius: '0.5rem',
-                                        buttonBorderRadius: '0.5rem',
-                                    }
-                                }
-                            }
-                        }}
-                        providers={[]}
-                        localization={{
-                            variables: {
-                                sign_in: {
-                                    email_label: 'E-mail',
-                                    password_label: 'Senha',
-                                    email_input_placeholder: 'Digite seu e-mail',
-                                    password_input_placeholder: 'Digite sua senha',
-                                    button_label: 'Entrar',
-                                    social_provider_text: 'Entrar com {{provider}}',
-                                    link_text: '',
-                                    forgotten_password_link_text: '',
-                                },
-                                sign_up: {
-                                    email_label: 'E-mail',
-                                    password_label: 'Senha',
-                                    email_input_placeholder: 'Digite seu e-mail',
-                                    password_input_placeholder: 'Crie sua senha',
-                                    button_label: 'Cadastrar',
-                                    social_provider_text: 'Cadastrar com {{provider}}',
-                                    link_text: '',
-                                },
-                                forgotten_password: {
-                                    email_label: 'Seu email',
-                                    button_label: 'Enviar instruções',
-                                    link_text: '',
-                                    confirmation_text: 'Verifique seu email para o link de recuperação de senha',
-                                },
-                                update_password: {
-                                    password_label: 'Nova senha',
-                                    password_input_placeholder: 'Sua nova senha',
-                                    button_label: 'Atualizar senha',
-                                    confirmation_text: 'Sua senha foi atualizada',
-                                }
-                            },
-                        }}
-                    />
+                    
+                    <form onSubmit={handleLogin} className="space-y-4">
+                        <Input 
+                            label="E-mail"
+                            type="email"
+                            placeholder="Digite seu e-mail"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                        <Input 
+                            label="Senha"
+                            type="password"
+                            placeholder="Digite sua senha"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                        {error && (
+                            <p className="text-sm text-red-600 text-center pt-2">{error}</p>
+                        )}
+                        <div className="pt-2">
+                            <Button type="submit" disabled={loading}>
+                                {loading ? 'Entrando...' : 'Entrar'}
+                            </Button>
+                        </div>
+                    </form>
+
                     <div className="text-center mt-4">
                         <Link to="/forgot-password" className="text-sm text-indigo-600 hover:underline">
                             Esqueceu sua senha?
@@ -892,7 +890,7 @@ const Section: React.FC<{ icon: React.ReactNode; title: string; children: React.
 );
 
 const ProfilePage: React.FC = () => {
-    const { user, updateUser, signOut, forceRevalidate } = useAuth();
+    const { user, updateUser, signOut } = useAuth();
     const navigate = useNavigate();
 
     // State for modals and forms
