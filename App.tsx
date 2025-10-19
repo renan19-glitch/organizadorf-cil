@@ -102,6 +102,7 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     
     const signOut = async () => {
       await supabaseService.signOut();
+      setUser(null);
     };
 
     const forceRevalidate = async () => {
@@ -921,8 +922,9 @@ const ProfilePage: React.FC = () => {
         setTimeout(() => setProfileSaveSuccess(false), 3000);
     };
     
-    const handleLogout = () => {
-        signOut();
+    const handleLogout = async () => {
+        await signOut();
+        navigate('/login', { replace: true });
     };
 
     const handlePasswordChange = async (e: React.FormEvent) => {
