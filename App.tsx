@@ -587,6 +587,8 @@ const BillsListPage: React.FC = () => {
     const [statusFilter, setStatusFilter] = useState('all');
     const [categoryFilter, setCategoryFilter] = useState('all');
     const [periodFilter, setPeriodFilter] = useState('all');
+    const [customStartDate, setCustomStartDate] = useState('');
+    const [customEndDate, setCustomEndDate] = useState('');
     const [billToDelete, setBillToDelete] = useState<Bill | null>(null);
     const [billToView, setBillToView] = useState<Bill | null>(null);
 
@@ -618,22 +620,39 @@ const BillsListPage: React.FC = () => {
             return bill.category === categoryFilter;
         })
         .filter(bill => {
-            if (periodFilter === 'all') return true;
-            
-            const today = new Date();
+            if (periodFilter === 'all') {
+                return true;
+            }
+
             const billDate = new Date(bill.dueDate);
+            billDate.setHours(0, 0, 0, 0);
+
+            if (periodFilter === 'custom') {
+                if (!customStartDate || !customEndDate) {
+                    return true;
+                }
+                const startDate = new Date(customStartDate.replace(/-/g, '/'));
+                const endDate = new Date(customEndDate.replace(/-/g, '/'));
+                startDate.setHours(0, 0, 0, 0);
+                endDate.setHours(0, 0, 0, 0);
+                return billDate >= startDate && billDate <= endDate;
+            }
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
 
             if (periodFilter === 'this_month') {
                 return billDate.getMonth() === today.getMonth() && billDate.getFullYear() === today.getFullYear();
             }
             if (periodFilter === 'last_month') {
-                const lastMonthDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
-                return billDate.getMonth() === lastMonthDate.getMonth() && billDate.getFullYear() === lastMonthDate.getFullYear();
+                const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+                return billDate.getMonth() === lastMonth.getMonth() && billDate.getFullYear() === lastMonth.getFullYear();
             }
             if (periodFilter === 'next_month') {
-                const nextMonthDate = new Date(today.getFullYear(), today.getMonth() + 1, 1);
-                return billDate.getMonth() === nextMonthDate.getMonth() && billDate.getFullYear() === nextMonthDate.getFullYear();
+                const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+                return billDate.getMonth() === nextMonth.getMonth() && billDate.getFullYear() === nextMonth.getFullYear();
             }
+            
             return true;
         })
         .sort((a, b) => {
@@ -658,17 +677,32 @@ const BillsListPage: React.FC = () => {
                     <button onClick={() => setStatusFilter('unpaid')} className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${statusFilter === 'unpaid' ? 'bg-indigo-600 text-white shadow' : 'bg-white text-slate-700 hover:bg-slate-100 border'}`}>Abertas</button>
                     <button onClick={() => setStatusFilter('paid')} className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${statusFilter === 'paid' ? 'bg-indigo-600 text-white shadow' : 'bg-white text-slate-700 hover:bg-slate-100 border'}`}>Pagas</button>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                     <Select label="Filtrar por Categoria" value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
                         <option value="all">Todas as Categorias</option>
                         {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                     </Select>
-                    <Select label="Filtrar por Período" value={periodFilter} onChange={e => setPeriodFilter(e.target.value)}>
-                        <option value="all">Todos os Períodos</option>
-                        <option value="this_month">Este Mês</option>
-                        <option value="last_month">Mês Passado</option>
-                        <option value="next_month">Próximo Mês</option>
-                    </Select>
+                    <div>
+                        <Select label="Filtrar por Período" value={periodFilter} onChange={e => {
+                            setPeriodFilter(e.target.value);
+                            if (e.target.value !== 'custom') {
+                                setCustomStartDate('');
+                                setCustomEndDate('');
+                            }
+                        }}>
+                            <option value="all">Todos os Períodos</option>
+                            <option value="this_month">Este Mês</option>
+                            <option value="last_month">Mês Passado</option>
+                            <option value="next_month">Próximo Mês</option>
+                            <option value="custom">Personalizado</option>
+                        </Select>
+                        {periodFilter === 'custom' && (
+                            <div className="grid grid-cols-2 gap-2 mt-2">
+                                <Input label="Data Início" type="date" value={customStartDate} onChange={e => setCustomStartDate(e.target.value)} />
+                                <Input label="Data Fim" type="date" value={customEndDate} onChange={e => setCustomEndDate(e.target.value)} />
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
             {loading ? <Spinner /> : (
