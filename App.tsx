@@ -214,26 +214,32 @@ const BillsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
             console.error('Error toggling paid status:', error);
             alert('Não foi possível atualizar o status da conta. Tente novamente.');
         } else {
-            setBills(prevBills =>
-                prevBills.map(bill =>
-                    bill.id === id 
-                        ? { ...bill, isPaid: newIsPaidStatus } 
-                        : bill
-                )
+            const updatedBills = bills.map(bill =>
+                bill.id === id 
+                    ? { ...bill, isPaid: newIsPaidStatus } 
+                    : bill
             );
+            setBills(updatedBills);
 
-            // If a recurring bill was just marked as PAID, create the next one
             if (newIsPaidStatus && billToToggle.isRecurring) {
                 const nextDueDate = new Date(billToToggle.dueDate);
                 nextDueDate.setMonth(nextDueDate.getMonth() + 1);
 
-                const { id: oldId, isPaid, ...restOfBill } = billToToggle;
+                const nextBillExists = updatedBills.some(bill => 
+                    bill.name === billToToggle.name &&
+                    bill.value === billToToggle.value &&
+                    !bill.isPaid &&
+                    new Date(bill.dueDate).getTime() === nextDueDate.getTime()
+                );
 
-                const nextBill: Omit<Bill, 'id' | 'isPaid'> = {
-                    ...restOfBill,
-                    dueDate: nextDueDate,
-                };
-                await addBill(nextBill);
+                if (!nextBillExists) {
+                    const { id: oldId, isPaid, ...restOfBill } = billToToggle;
+                    const nextBill: Omit<Bill, 'id' | 'isPaid'> = {
+                        ...restOfBill,
+                        dueDate: nextDueDate,
+                    };
+                    await addBill(nextBill);
+                }
             }
         }
     };
