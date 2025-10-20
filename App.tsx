@@ -8,7 +8,7 @@ import { supabaseService } from './services';
 import { useAuth, useBills, useCategories } from './hooks';
 import { AuthContext, BillsContext, CategoriesContext } from './contexts';
 import {
-    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon, HotmartWordmark, AccordionItem, CalculatorIcon, TrophyIcon, ChatBubbleIcon, SparklesIcon, TrashIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon
+    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon, HotmartWordmark, AccordionItem, CalculatorIcon, TrophyIcon, ChatBubbleIcon, SparklesIcon, TrashIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, ChevronLeftIcon, ChevronRightIcon
 } from './components';
 import SubscribePage from '@/src/pages/SubscribePage';
 
@@ -588,6 +588,20 @@ const UpdatePasswordPage: React.FC = () => {
 const HomePage: React.FC = () => {
     const { user } = useAuth();
     const { bills, loading } = useBills();
+    const [selectedDate, setSelectedDate] = useState(new Date());
+
+    const handlePreviousMonth = () => {
+        setSelectedDate(prevDate => new Date(prevDate.getFullYear(), prevDate.getMonth() - 1, 1));
+    };
+
+    const handleNextMonth = () => {
+        setSelectedDate(prevDate => new Date(prevDate.getFullYear(), prevDate.getMonth() + 1, 1));
+    };
+
+    const isNextMonthDisabled = () => {
+        const now = new Date();
+        return selectedDate.getFullYear() === now.getFullYear() && selectedDate.getMonth() === now.getMonth();
+    };
 
     if (loading) return <Spinner />;
 
@@ -634,36 +648,37 @@ const HomePage: React.FC = () => {
 
     const formatCurrency = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
 
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+    const selectedMonth = selectedDate.getMonth();
+    const selectedYear = selectedDate.getFullYear();
+    
+    const previousMonthDate = new Date(selectedYear, selectedMonth - 1, 1);
+    const previousMonth = previousMonthDate.getMonth();
+    const previousMonthYear = previousMonthDate.getFullYear();
 
-    const paidThisMonthBills = bills.filter(b => {
+    const paidSelectedMonthBills = bills.filter(b => {
         const billDate = new Date(b.dueDate);
-        return b.isPaid && billDate.getMonth() === currentMonth && billDate.getFullYear() === currentYear;
+        return b.isPaid && billDate.getMonth() === selectedMonth && billDate.getFullYear() === selectedYear;
     });
 
-    const paidLastMonthBills = bills.filter(b => {
+    const paidPreviousMonthBills = bills.filter(b => {
         const billDate = new Date(b.dueDate);
-        return b.isPaid && billDate.getMonth() === lastMonth && billDate.getFullYear() === lastMonthYear;
+        return b.isPaid && billDate.getMonth() === previousMonth && billDate.getFullYear() === previousMonthYear;
     });
 
-    const pendingThisMonthBills = bills.filter(b => {
+    const pendingSelectedMonthBills = bills.filter(b => {
         const billDate = new Date(b.dueDate);
-        return !b.isPaid && billDate.getMonth() === currentMonth && billDate.getFullYear() === currentYear;
+        return !b.isPaid && billDate.getMonth() === selectedMonth && billDate.getFullYear() === selectedYear;
     });
 
-    const totalPaidThisMonth = paidThisMonthBills.reduce((sum, b) => sum + b.value, 0);
-    const totalPaidLastMonth = paidLastMonthBills.reduce((sum, b) => sum + b.value, 0);
-    const totalPendingThisMonth = pendingThisMonthBills.reduce((sum, b) => sum + b.value, 0);
+    const totalPaidSelectedMonth = paidSelectedMonthBills.reduce((sum, b) => sum + b.value, 0);
+    const totalPaidPreviousMonth = paidPreviousMonthBills.reduce((sum, b) => sum + b.value, 0);
+    const totalPendingSelectedMonth = pendingSelectedMonthBills.reduce((sum, b) => sum + b.value, 0);
 
-    const monthlyChange = totalPaidLastMonth > 0 
-        ? ((totalPaidThisMonth - totalPaidLastMonth) / totalPaidLastMonth) * 100
-        : totalPaidThisMonth > 0 ? 100 : 0;
+    const monthlyChange = totalPaidPreviousMonth > 0 
+        ? ((totalPaidSelectedMonth - totalPaidPreviousMonth) / totalPaidPreviousMonth) * 100
+        : totalPaidSelectedMonth > 0 ? 100 : 0;
 
-    const spendingByCategory = paidThisMonthBills.reduce((acc, bill) => {
+    const spendingByCategory = paidSelectedMonthBills.reduce((acc, bill) => {
         acc[bill.category] = (acc[bill.category] || 0) + bill.value;
         return acc;
     }, {} as { [key: string]: number });
@@ -685,20 +700,36 @@ const HomePage: React.FC = () => {
             </div>
 
             <div className="mt-10">
-                <h2 className="text-2xl font-bold text-slate-800 mb-1">Análise Financeira</h2>
-                <p className="text-slate-500 mb-4">Veja um resumo dos seus gastos e tendências.</p>
+                <div className="flex justify-between items-center mb-4">
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-800 mb-1">Análise Financeira</h2>
+                        <p className="text-slate-500">Veja um resumo dos seus gastos e tendências.</p>
+                    </div>
+                </div>
+
+                <div className="flex justify-between items-center bg-slate-100 p-2 rounded-lg mb-4">
+                    <button onClick={handlePreviousMonth} className="p-2 rounded-md hover:bg-slate-200 text-slate-600">
+                        <ChevronLeftIcon className="h-6 w-6" />
+                    </button>
+                    <span className="font-bold text-lg text-slate-800 capitalize">
+                        {selectedDate.toLocaleString('pt-BR', { month: 'long', year: 'numeric' })}
+                    </span>
+                    <button onClick={handleNextMonth} disabled={isNextMonthDisabled()} className="p-2 rounded-md hover:bg-slate-200 text-slate-600 disabled:opacity-30 disabled:cursor-not-allowed">
+                        <ChevronRightIcon className="h-6 w-6" />
+                    </button>
+                </div>
                 
                 <div className="space-y-4">
                     <Card>
-                        <h3 className="font-bold text-lg text-slate-800 mb-3">Resumo de {now.toLocaleString('pt-BR', { month: 'long' })}</h3>
+                        <h3 className="font-bold text-lg text-slate-800 mb-3">Resumo de {selectedDate.toLocaleString('pt-BR', { month: 'long' })}</h3>
                         <div className="flex justify-between items-center bg-slate-50 p-4 rounded-lg">
                             <div>
                                 <p className="text-sm text-slate-500">Total Pago</p>
-                                <p className="text-2xl font-bold text-emerald-600">{formatCurrency(totalPaidThisMonth)}</p>
+                                <p className="text-2xl font-bold text-emerald-600">{formatCurrency(totalPaidSelectedMonth)}</p>
                             </div>
                             <div>
                                 <p className="text-sm text-slate-500 text-right">Total Pendente</p>
-                                <p className="text-2xl font-bold text-yellow-600">{formatCurrency(totalPendingThisMonth)}</p>
+                                <p className="text-2xl font-bold text-yellow-600">{formatCurrency(totalPendingSelectedMonth)}</p>
                             </div>
                         </div>
                     </Card>
@@ -707,8 +738,8 @@ const HomePage: React.FC = () => {
                         <h3 className="font-bold text-lg text-slate-800 mb-3">Comparativo Mensal</h3>
                         <div className="flex justify-between items-center">
                             <div>
-                                <p className="text-sm text-slate-500">Gastos no mês passado</p>
-                                <p className="text-xl font-semibold text-slate-700">{formatCurrency(totalPaidLastMonth)}</p>
+                                <p className="text-sm text-slate-500">Gastos no mês anterior</p>
+                                <p className="text-xl font-semibold text-slate-700">{formatCurrency(totalPaidPreviousMonth)}</p>
                             </div>
                             <div className={`flex items-center font-bold text-lg ${monthlyChange >= 0 ? 'text-red-500' : 'text-green-600'}`}>
                                 {monthlyChange >= 0 ? <ArrowTrendingUpIcon className="h-5 w-5 mr-1" /> : <ArrowTrendingDownIcon className="h-5 w-5 mr-1" />}
@@ -718,7 +749,7 @@ const HomePage: React.FC = () => {
                     </Card>
 
                     <Card>
-                        <h3 className="font-bold text-lg text-slate-800 mb-4">Gastos por Categoria (Mês Atual)</h3>
+                        <h3 className="font-bold text-lg text-slate-800 mb-4">Gastos por Categoria ({selectedDate.toLocaleString('pt-BR', { month: 'long' })})</h3>
                         {sortedCategories.length > 0 ? (
                             <div className="space-y-3">
                                 {sortedCategories.map(([category, value]) => (
@@ -737,7 +768,7 @@ const HomePage: React.FC = () => {
                                 ))}
                             </div>
                         ) : (
-                            <p className="text-slate-500 text-center py-4">Nenhum gasto registrado este mês para exibir a análise.</p>
+                            <p className="text-slate-500 text-center py-4">Nenhum gasto registrado neste mês para exibir a análise.</p>
                         )}
                     </Card>
                 </div>
