@@ -19,6 +19,12 @@ export interface Bill {
   isRecurring: boolean;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  user_id: string;
+}
+
 export interface Subscription {
   planName: string;
   status: 'active' | 'inactive';

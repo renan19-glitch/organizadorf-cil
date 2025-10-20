@@ -3,12 +3,12 @@ import { Routes, Route, Link, useNavigate, useLocation, Navigate, Outlet, usePar
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { supabase } from '@/src/integrations/supabase/client';
-import type { User, Bill } from './types';
+import type { User, Bill, Category } from './types';
 import { supabaseService } from './services';
-import { useAuth, useBills } from './hooks';
-import { AuthContext, BillsContext } from './contexts';
+import { useAuth, useBills, useCategories } from './hooks';
+import { AuthContext, BillsContext, CategoriesContext } from './contexts';
 import {
-    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon, HotmartWordmark, AccordionItem, CalculatorIcon, TrophyIcon, ChatBubbleIcon, SparklesIcon
+    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon, HotmartWordmark, AccordionItem, CalculatorIcon, TrophyIcon, ChatBubbleIcon, SparklesIcon, TrashIcon
 } from './components';
 import SubscribePage from '@/src/pages/SubscribePage';
 
@@ -81,7 +81,6 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             if (event === 'SIGNED_OUT') {
                 setUser(null);
             } else if (session) {
-                // If a session becomes available (e.g., SIGNED_IN), re-check everything.
                 checkSessionAndSetUser();
             }
         });
@@ -113,6 +112,58 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
         <AuthContext.Provider value={{ user, loading, updateUser, signOut, forceRevalidate }}>
             {children}
         </AuthContext.Provider>
+    );
+};
+
+const CategoriesProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [loading, setLoading] = useState(true);
+    const { user } = useAuth();
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            if (user) {
+                setLoading(true);
+                const { data, error } = await supabaseService.getCategories(user.id);
+                if (error) {
+                    console.error('Error fetching categories:', error);
+                    setCategories([]);
+                } else if (data) {
+                    setCategories(data);
+                }
+                setLoading(false);
+            } else {
+                setCategories([]);
+                setLoading(false);
+            }
+        };
+
+        fetchCategories();
+    }, [user]);
+
+    const addCategory = async (name: string) => {
+        if (!user) return;
+        const { data: newCategory, error } = await supabaseService.addCategory({ user_id: user.id, name });
+        if (error) {
+            console.error('Error adding category:', error);
+        } else if (newCategory) {
+            setCategories(prev => [...prev, newCategory].sort((a, b) => a.name.localeCompare(b.name)));
+        }
+    };
+
+    const deleteCategory = async (id: string) => {
+        const { error } = await supabaseService.deleteCategory(id);
+        if (error) {
+            console.error('Error deleting category:', error);
+        } else {
+            setCategories(prev => prev.filter(c => c.id !== id));
+        }
+    };
+
+    return (
+        <CategoriesContext.Provider value={{ categories, addCategory, deleteCategory, loading }}>
+            {children}
+        </CategoriesContext.Provider>
     );
 };
 
@@ -713,6 +764,7 @@ const HomePage: React.FC = () => {
 
 const BillsListPage: React.FC = () => {
     const { bills, loading, togglePaid, deleteBill } = useBills();
+    const { categories } = useCategories();
     const navigate = useNavigate();
     const [statusFilter, setStatusFilter] = useState('all');
     const [categoryFilter, setCategoryFilter] = useState('all');
@@ -721,8 +773,6 @@ const BillsListPage: React.FC = () => {
     const [customEndDate, setCustomEndDate] = useState('');
     const [billToDelete, setBillToDelete] = useState<Bill | null>(null);
     const [billToView, setBillToView] = useState<Bill | null>(null);
-
-    const categories = ['Casa', 'Internet', 'Cartão', 'Educação', 'Outros'];
 
     const handleEdit = (id: string) => {
         navigate(`/edit-bill/${id}`);
@@ -810,7 +860,7 @@ const BillsListPage: React.FC = () => {
                 <div className="grid grid-cols-1 gap-4">
                     <Select label="Filtrar por Categoria" value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)}>
                         <option value="all">Todas as Categorias</option>
-                        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                        {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
                     </Select>
                     <div>
                         <Select label="Filtrar por Período" value={periodFilter} onChange={e => {
@@ -914,13 +964,20 @@ const BillsListPage: React.FC = () => {
 
 const AddBillPage: React.FC = () => {
     const { addBill } = useBills();
+    const { categories, loading: categoriesLoading } = useCategories();
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [value, setValue] = useState('');
     const [dueDate, setDueDate] = useState('');
-    const [category, setCategory] = useState('Casa');
+    const [category, setCategory] = useState('');
     const [observations, setObservations] = useState('');
     const [isRecurring, setIsRecurring] = useState(false);
+
+    useEffect(() => {
+        if (categories.length > 0) {
+            setCategory(categories[0].name);
+        }
+    }, [categories]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -940,12 +997,12 @@ const AddBillPage: React.FC = () => {
                 <Input label="Nome da Conta" value={name} onChange={e => setName(e.target.value)} required />
                 <Input label="Valor (R$)" value={value} onChange={e => setValue(e.target.value)} type="text" placeholder="100,00" required />
                 <Input label="Data de Vencimento" value={dueDate} onChange={e => setDueDate(e.target.value)} type="date" required />
-                <Select label="Categoria" value={category} onChange={e => setCategory(e.target.value)}>
-                    <option>Casa</option>
-                    <option>Internet</option>
-                    <option>Cartão</option>
-                    <option>Educação</option>
-                    <option>Outros</option>
+                <Select label="Categoria" value={category} onChange={e => setCategory(e.target.value)} disabled={categoriesLoading}>
+                    {categories.length === 0 && !categoriesLoading ? (
+                        <option>Crie uma categoria no seu perfil</option>
+                    ) : (
+                        categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)
+                    )}
                 </Select>
                 <Textarea label="Observações" value={observations} onChange={e => setObservations(e.target.value)} />
                 <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg">
@@ -961,13 +1018,14 @@ const AddBillPage: React.FC = () => {
 const EditBillPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const { bills, updateBill } = useBills();
+    const { categories, loading: categoriesLoading } = useCategories();
     const navigate = useNavigate();
     const billToEdit = bills.find(b => b.id === id);
 
     const [name, setName] = useState('');
     const [value, setValue] = useState('');
     const [dueDate, setDueDate] = useState('');
-    const [category, setCategory] = useState('Casa');
+    const [category, setCategory] = useState('');
     const [observations, setObservations] = useState('');
     const [isRecurring, setIsRecurring] = useState(false);
 
@@ -1013,12 +1071,8 @@ const EditBillPage: React.FC = () => {
                 <Input label="Nome da Conta" value={name} onChange={e => setName(e.target.value)} required />
                 <Input label="Valor (R$)" value={value} onChange={e => setValue(e.target.value)} type="text" placeholder="100,00" required />
                 <Input label="Data de Vencimento" value={dueDate} onChange={e => setDueDate(e.target.value)} type="date" required />
-                <Select label="Categoria" value={category} onChange={e => setCategory(e.target.value)}>
-                    <option>Casa</option>
-                    <option>Internet</option>
-                    <option>Cartão</option>
-                    <option>Educação</option>
-                    <option>Outros</option>
+                <Select label="Categoria" value={category} onChange={e => setCategory(e.target.value)} disabled={categoriesLoading}>
+                    {categories.map(cat => <option key={cat.id} value={cat.name}>{cat.name}</option>)}
                 </Select>
                 <Textarea label="Observações" value={observations} onChange={e => setObservations(e.target.value)} />
                 <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg">
@@ -1120,19 +1174,19 @@ const Section: React.FC<{ icon: React.ReactNode; title: string; children: React.
 
 const ProfilePage: React.FC = () => {
     const { user, updateUser, signOut } = useAuth();
+    const { categories, addCategory, deleteCategory, loading: categoriesLoading } = useCategories();
     const navigate = useNavigate();
 
-    // State for modals and forms
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
     const [name, setName] = useState(user?.name || '');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    
-    // State for UI feedback
     const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
     const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
     const [isSavingProfile, setIsSavingProfile] = useState(false);
     const [profileSaveSuccess, setProfileSaveSuccess] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState('');
+    const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
     
     useEffect(() => {
         if (user) {
@@ -1189,6 +1243,21 @@ const ProfilePage: React.FC = () => {
         }
     };
 
+    const handleAddCategory = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (newCategoryName.trim()) {
+            await addCategory(newCategoryName.trim());
+            setNewCategoryName('');
+        }
+    };
+
+    const confirmDeleteCategory = () => {
+        if (categoryToDelete) {
+            deleteCategory(categoryToDelete.id);
+            setCategoryToDelete(null);
+        }
+    };
+
     return (
         <div>
             <Header title="Meu Perfil" />
@@ -1207,6 +1276,27 @@ const ProfilePage: React.FC = () => {
                     </div>
                 </Section>
             </form>
+
+            <Section icon={<DocumentTextIcon className="h-7 w-7" />} title="Minhas Categorias">
+                <div className="space-y-3 mb-4">
+                    {categoriesLoading ? <Spinner /> : categories.length > 0 ? (
+                        categories.map(cat => (
+                            <div key={cat.id} className="flex justify-between items-center bg-white p-3 rounded-md border">
+                                <span className="text-slate-700">{cat.name}</span>
+                                <button onClick={() => setCategoryToDelete(cat)} className="text-red-500 hover:text-red-700">
+                                    <TrashIcon className="h-5 w-5" />
+                                </button>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-slate-500 text-center py-4">Você ainda não tem categorias.</p>
+                    )}
+                </div>
+                <form onSubmit={handleAddCategory} className="flex gap-2">
+                    <Input label="" placeholder="Nova categoria" value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} />
+                    <Button type="submit" className="!w-auto px-5">Adicionar</Button>
+                </form>
+            </Section>
 
             <form onSubmit={handlePasswordChange}>
                 <Section icon={<ShieldCheckIcon className="h-7 w-7" />} title="Segurança">
@@ -1255,6 +1345,16 @@ const ProfilePage: React.FC = () => {
                     <Button variant="danger" onClick={handleLogout}>Sair</Button>
                 </div>
             </Modal>
+
+            <Modal isOpen={!!categoryToDelete} onClose={() => setCategoryToDelete(null)} title="Confirmar Exclusão">
+                <p className="mb-6 text-slate-600">
+                    Você tem certeza que deseja excluir a categoria "<strong>{categoryToDelete?.name}</strong>"?
+                </p>
+                <div className="flex justify-end space-x-4">
+                    <Button variant="secondary" onClick={() => setCategoryToDelete(null)}>Cancelar</Button>
+                    <Button variant="danger" onClick={confirmDeleteCategory}>Excluir</Button>
+                </div>
+            </Modal>
         </div>
     );
 };
@@ -1263,7 +1363,9 @@ const ProfilePage: React.FC = () => {
 const App: React.FC = () => {
   return (
     <AuthProvider>
-        <RouterWrapper />
+        <CategoriesProvider>
+            <RouterWrapper />
+        </CategoriesProvider>
     </AuthProvider>
   );
 };

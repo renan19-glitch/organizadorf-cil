@@ -1,5 +1,5 @@
 import { createContext } from 'react';
-import type { User, Bill } from './types';
+import type { User, Bill, Category } from './types';
 
 export const AuthContext = createContext<{
     user: User | null;
@@ -15,5 +15,12 @@ export const BillsContext = createContext<{
     updateBill: (updatedBill: Bill) => Promise<void>;
     deleteBill: (id: string) => Promise<void>;
     togglePaid: (id: string) => Promise<void>;
+    loading: boolean;
+} | undefined>(undefined);
+
+export const CategoriesContext = createContext<{
+    categories: Category[];
+    addCategory: (name: string) => Promise<void>;
+    deleteCategory: (id: string) => Promise<void>;
     loading: boolean;
 } | undefined>(undefined);

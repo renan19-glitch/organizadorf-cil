@@ -48,4 +48,15 @@ export const supabaseService = {
   deleteBill: (billId: string) => {
     return supabase.from('bills').delete().eq('id', billId);
   },
+
+  // CATEGORIES
+  getCategories: (userId: string) => {
+    return supabase.from('categories').select('*').eq('user_id', userId).order('name', { ascending: true });
+  },
+  addCategory: (categoryData: { user_id: string; name: string }) => {
+    return supabase.from('categories').insert(categoryData).select().single();
+  },
+  deleteCategory: (categoryId: string) => {
+    return supabase.from('categories').delete().eq('id', categoryId);
+  },
 };
