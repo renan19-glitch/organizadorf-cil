@@ -227,8 +227,10 @@ const BillsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 const nextDueDate = new Date(billToToggle.dueDate);
                 nextDueDate.setMonth(nextDueDate.getMonth() + 1);
 
+                const { id: oldId, isPaid, ...restOfBill } = billToToggle;
+
                 const nextBill: Omit<Bill, 'id' | 'isPaid'> = {
-                    ...billToToggle,
+                    ...restOfBill,
                     dueDate: nextDueDate,
                 };
                 await addBill(nextBill);
