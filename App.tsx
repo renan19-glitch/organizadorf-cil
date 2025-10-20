@@ -450,15 +450,11 @@ const ForgotPasswordPage: React.FC = () => {
 
 const UpdatePasswordPage: React.FC = () => {
     const navigate = useNavigate();
-    const [sessionReady, setSessionReady] = useState(false);
 
     useEffect(() => {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (event === 'PASSWORD_RECOVERY') {
-                setSessionReady(true);
-            }
-            if (event === 'USER_UPDATED' && session) {
-                navigate('/');
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+            if (event === 'USER_UPDATED') {
+                navigate('/login?message=password-updated', { replace: true });
             }
         });
 
@@ -476,42 +472,36 @@ const UpdatePasswordPage: React.FC = () => {
                     <p className="text-center text-slate-600 mb-6 text-sm">
                         Digite sua nova senha abaixo para acessar sua conta.
                     </p>
-                    {sessionReady ? (
-                        <Auth
-                            supabaseClient={supabase}
-                            view="update_password"
-                            appearance={{
-                                theme: ThemeSupa,
-                                variables: {
-                                    default: {
-                                        colors: {
-                                            brand: 'rgb(79 70 229)',
-                                            brandAccent: 'rgb(99 102 241)',
-                                        },
-                                        radii: {
-                                            borderRadius: '0.5rem',
-                                            buttonBorderRadius: '0.5rem',
-                                        }
+                    <Auth
+                        supabaseClient={supabase}
+                        view="update_password"
+                        appearance={{
+                            theme: ThemeSupa,
+                            variables: {
+                                default: {
+                                    colors: {
+                                        brand: 'rgb(79 70 229)',
+                                        brandAccent: 'rgb(99 102 241)',
+                                    },
+                                    radii: {
+                                        borderRadius: '0.5rem',
+                                        buttonBorderRadius: '0.5rem',
                                     }
                                 }
-                            }}
-                            providers={[]}
-                            localization={{
-                                variables: {
-                                    update_password: {
-                                        password_label: 'Nova senha',
-                                        password_input_placeholder: 'Sua nova senha',
-                                        button_label: 'Salvar e Entrar',
-                                        confirmation_text: 'Sua senha foi atualizada com sucesso!',
-                                    }
-                                },
-                            }}
-                        />
-                    ) : (
-                        <div className="py-8">
-                            <Spinner />
-                        </div>
-                    )}
+                            }
+                        }}
+                        providers={[]}
+                        localization={{
+                            variables: {
+                                update_password: {
+                                    password_label: 'Nova senha',
+                                    password_input_placeholder: 'Sua nova senha',
+                                    button_label: 'Salvar nova senha',
+                                    confirmation_text: 'Sua senha foi atualizada com sucesso!',
+                                }
+                            },
+                        }}
+                    />
                 </Card>
             </div>
         </AppContainer>
