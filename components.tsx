@@ -429,7 +429,7 @@ export const BillItem: React.FC<BillItemProps> = ({ bill, onTogglePaid, onEdit, 
         <div className="flex-grow">
           <div className="flex items-center">
             <p className={`font-bold text-lg ${bill.isPaid ? 'line-through text-slate-500' : 'text-slate-800'}`}>{bill.name}</p>
-            {bill.isRecurring && <RefreshIcon className="h-4 w-4 ml-2 text-slate-400" />}
+            {bill.isRecurring && <span className="ml-2 text-xs font-semibold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full">Recorrente</span>}
           </div>
           <p className="text-slate-600 font-semibold">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bill.value)}</p>
           <div className="flex items-center text-sm text-slate-500 mt-1">
