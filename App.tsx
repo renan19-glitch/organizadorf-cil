@@ -8,9 +8,10 @@ import { supabaseService } from './services';
 import { useAuth, useBills } from './hooks';
 import { AuthContext, BillsContext } from './contexts';
 import {
-    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon, HotmartWordmark
+    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon, HotmartWordmark, AccordionItem
 } from './components';
 import SubscribePage from './src/pages/SubscribePage';
+import { scheduleBillNotifications } from './src/notifications';
 
 const translateSupabaseError = (message?: string): string => {
     if (!message) return 'Ocorreu um erro desconhecido.';
@@ -152,6 +153,12 @@ const BillsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
         fetchBills();
     }, [user]);
+
+    useEffect(() => {
+        if (user && bills.length > 0) {
+            scheduleBillNotifications(bills);
+        }
+    }, [bills, user]);
 
     const addBill = async (billData: Omit<Bill, 'id' | 'isPaid'>) => {
         if (!user) return;
@@ -555,6 +562,41 @@ const HomePage: React.FC = () => {
         return banners;
     };
 
+    const educationalContent = [
+        {
+            title: "Por que usar o PagueFácil todos os dias?",
+            content: (
+                <p>
+                    Criar o hábito de abrir o aplicativo diariamente, mesmo que por um minuto, te mantém no controle total de suas finanças. Você visualiza rapidamente o que está por vir, evita surpresas e fortalece sua disciplina financeira.
+                </p>
+            )
+        },
+        {
+            title: "Dica de Ouro: Como evitar multas por atraso",
+            content: (
+                <p>
+                    A melhor forma de evitar multas é a antecipação. Use a função de "Observações" para adicionar lembretes, como "Pagar 2 dias antes". Além disso, ative as notificações do app para ser sempre lembrado no dia do vencimento.
+                </p>
+            )
+        },
+        {
+            title: "Você Sabia? O impacto dos atrasos no seu bolso",
+            content: (
+                <p>
+                    Estudos mostram que uma família média pode gastar centenas de reais por ano apenas com multas e juros por atraso de contas. Usar uma ferramenta como o PagueFácil não é apenas sobre organização, é sobre economizar dinheiro de verdade.
+                </p>
+            )
+        },
+        {
+            title: "Entendendo os Alertas de Vencimento",
+            content: (
+                <p>
+                    Nossos alertas coloridos não são apenas estéticos. O <strong className="text-yellow-600">amarelo</strong> significa "Atenção, vence hoje!", enquanto o <strong className="text-red-600">vermelho</strong> é um sinal de "Urgente, conta vencida!". Prestar atenção a essas cores te ajuda a priorizar seus pagamentos.
+                </p>
+            )
+        }
+    ];
+
     return (
         <div>
             <header className="mb-4">
@@ -566,6 +608,17 @@ const HomePage: React.FC = () => {
                 <SummaryCard title="Vencidas" amount={overdue.length} value={total(overdue)} color="red" icon={<ClockIcon className="h-6 w-6" />} />
                 <SummaryCard title="Vencendo Hoje" amount={dueToday.length} value={total(dueToday)} color="yellow" icon={<CalendarIcon className="h-6 w-6" />} />
                 <SummaryCard title="Próximos Vencimentos" amount={upcoming.length} value={total(upcoming)} color="green" icon={<TrendingUpIcon className="h-6 w-6" />} />
+            </div>
+
+            <div className="mt-10">
+                <h2 className="text-2xl font-bold text-slate-800 mb-2">Central de Educação Financeira</h2>
+                <Card className="p-2 sm:p-4">
+                    {educationalContent.map((item, index) => (
+                        <AccordionItem key={index} title={item.title}>
+                            {item.content}
+                        </AccordionItem>
+                    ))}
+                </Card>
             </div>
         </div>
     );

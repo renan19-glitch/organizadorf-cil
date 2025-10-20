@@ -126,6 +126,12 @@ export const HotmartWordmark = ({ className }: { className?: string }) => (
     </svg>
 );
 
+const ChevronDownIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className={className || "w-6 h-6"}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+    </svg>
+);
+
 
 // --- UI COMPONENTS ---
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -248,6 +254,36 @@ export const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ checked, onChange })
         } pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out`}
       />
     </button>
+  );
+};
+
+interface AccordionItemProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+export const AccordionItem: React.FC<AccordionItemProps> = ({ title, children }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="border-b border-slate-200 last:border-b-0">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex justify-between items-center text-left py-4"
+      >
+        <span className="font-semibold text-slate-800">{title}</span>
+        <ChevronDownIcon className={`h-5 w-5 text-slate-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+      </button>
+      <div
+        className={`grid overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}
+      >
+        <div className="overflow-hidden">
+            <div className="pb-4 text-slate-600">
+                {children}
+            </div>
+        </div>
+      </div>
+    </div>
   );
 };
 
