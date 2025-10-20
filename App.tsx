@@ -568,7 +568,7 @@ const HomePage: React.FC = () => {
             title: "Dica de Ouro: Como evitar multas por atraso",
             content: (
                 <p>
-                    A melhor forma de evitar multas é a antecipação. Use a função de "Observações" para adicionar lembretes, como "Pagar 2 dias antes". Além disso, ative as notificações do app para ser sempre lembrado no dia do vencimento.
+                    A melhor forma de evitar multas é a antecipação. Use a função de "Observações" para adicionar lembretes, como "Pagar 2 dias antes". Fique de olho também nos alertas de vencimento na tela inicial; eles são seus maiores aliados para não perder nenhum prazo.
                 </p>
             )
         },
