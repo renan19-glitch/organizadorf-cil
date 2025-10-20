@@ -156,6 +156,13 @@ export const SparklesIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
+export const RefreshIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className || "w-6 h-6"}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0011.664 0l3.181-3.183m-11.664 0l3.181-3.183a8.25 8.25 0 00-11.664 0l3.181 3.183" />
+    </svg>
+);
+
+
 // --- UI COMPONENTS ---
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   children: React.ReactNode;
@@ -420,7 +427,10 @@ export const BillItem: React.FC<BillItemProps> = ({ bill, onTogglePaid, onEdit, 
       <div className="flex items-center flex-grow cursor-pointer" onClick={() => onViewDetails(bill)}>
         <div className={`w-2 h-16 rounded-full ${statusInfo[status].color} mr-4 flex-shrink-0`}></div>
         <div className="flex-grow">
-          <p className={`font-bold text-lg ${bill.isPaid ? 'line-through text-slate-500' : 'text-slate-800'}`}>{bill.name}</p>
+          <div className="flex items-center">
+            <p className={`font-bold text-lg ${bill.isPaid ? 'line-through text-slate-500' : 'text-slate-800'}`}>{bill.name}</p>
+            {bill.isRecurring && <RefreshIcon className="h-4 w-4 ml-2 text-slate-400" />}
+          </div>
           <p className="text-slate-600 font-semibold">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bill.value)}</p>
           <div className="flex items-center text-sm text-slate-500 mt-1">
             <CalendarIcon className="h-4 w-4 mr-1.5" />

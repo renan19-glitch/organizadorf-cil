@@ -129,6 +129,7 @@ const BillsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         category: supabaseBill.category,
         observations: supabaseBill.observations,
         isPaid: supabaseBill.is_paid,
+        isRecurring: supabaseBill.is_recurring,
     });
 
     useEffect(() => {
@@ -156,12 +157,13 @@ const BillsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     const addBill = async (billData: Omit<Bill, 'id' | 'isPaid'>) => {
         if (!user) return;
 
-        const { dueDate, ...restOfBillData } = billData;
+        const { dueDate, isRecurring, ...restOfBillData } = billData;
         const billPayload = {
             ...restOfBillData,
             user_id: user.id,
             due_date: dueDate.toISOString().split('T')[0],
             is_paid: false,
+            is_recurring: isRecurring,
         };
 
         const { data: newBill, error } = await supabaseService.addBill(billPayload);
@@ -174,11 +176,12 @@ const BillsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     };
 
     const updateBill = async (updatedBill: Bill) => {
-        const { id, dueDate, isPaid, ...restOfBillData } = updatedBill;
+        const { id, dueDate, isPaid, isRecurring, ...restOfBillData } = updatedBill;
         const updatePayload = {
             ...restOfBillData,
             due_date: dueDate.toISOString().split('T')[0],
             is_paid: isPaid,
+            is_recurring: isRecurring,
         };
 
         const { data: returnedBill, error } = await supabaseService.updateBill(id, updatePayload);
@@ -218,6 +221,18 @@ const BillsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         : bill
                 )
             );
+
+            // If a recurring bill was just marked as PAID, create the next one
+            if (newIsPaidStatus && billToToggle.isRecurring) {
+                const nextDueDate = new Date(billToToggle.dueDate);
+                nextDueDate.setMonth(nextDueDate.getMonth() + 1);
+
+                const nextBill: Omit<Bill, 'id' | 'isPaid'> = {
+                    ...billToToggle,
+                    dueDate: nextDueDate,
+                };
+                await addBill(nextBill);
+            }
         }
     };
     
@@ -891,6 +906,7 @@ const AddBillPage: React.FC = () => {
     const [dueDate, setDueDate] = useState('');
     const [category, setCategory] = useState('Casa');
     const [observations, setObservations] = useState('');
+    const [isRecurring, setIsRecurring] = useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -899,7 +915,7 @@ const AddBillPage: React.FC = () => {
             alert('Valor inválido');
             return;
         }
-        addBill({ name, value: billValue, dueDate: new Date(dueDate.replace(/-/g, '/')), category, observations });
+        addBill({ name, value: billValue, dueDate: new Date(dueDate.replace(/-/g, '/')), category, observations, isRecurring });
         navigate('/bills');
     };
 
@@ -918,6 +934,10 @@ const AddBillPage: React.FC = () => {
                     <option>Outros</option>
                 </Select>
                 <Textarea label="Observações" value={observations} onChange={e => setObservations(e.target.value)} />
+                <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg">
+                    <label className="font-semibold text-slate-700">Repetir mensalmente?</label>
+                    <ToggleSwitch checked={isRecurring} onChange={setIsRecurring} />
+                </div>
                 <Button type="submit">Salvar Conta</Button>
             </form>
         </div>
@@ -935,6 +955,7 @@ const EditBillPage: React.FC = () => {
     const [dueDate, setDueDate] = useState('');
     const [category, setCategory] = useState('Casa');
     const [observations, setObservations] = useState('');
+    const [isRecurring, setIsRecurring] = useState(false);
 
     useEffect(() => {
         if (billToEdit) {
@@ -943,6 +964,7 @@ const EditBillPage: React.FC = () => {
             setDueDate(billToEdit.dueDate.toISOString().split('T')[0]);
             setCategory(billToEdit.category);
             setObservations(billToEdit.observations);
+            setIsRecurring(billToEdit.isRecurring);
         }
     }, [billToEdit]);
 
@@ -960,6 +982,7 @@ const EditBillPage: React.FC = () => {
             dueDate: new Date(dueDate.replace(/-/g, '/')),
             category,
             observations,
+            isRecurring,
         };
         updateBill(updatedBill);
         navigate('/bills');
@@ -984,6 +1007,10 @@ const EditBillPage: React.FC = () => {
                     <option>Outros</option>
                 </Select>
                 <Textarea label="Observações" value={observations} onChange={e => setObservations(e.target.value)} />
+                <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg">
+                    <label className="font-semibold text-slate-700">Repetir mensalmente?</label>
+                    <ToggleSwitch checked={isRecurring} onChange={setIsRecurring} />
+                </div>
                 <Button type="submit">Salvar Alterações</Button>
             </form>
         </div>

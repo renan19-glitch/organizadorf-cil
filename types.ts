@@ -16,6 +16,7 @@ export interface Bill {
   category: string;
   observations: string;
   isPaid: boolean;
+  isRecurring: boolean;
 }
 
 export interface Subscription {
