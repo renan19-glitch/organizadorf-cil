@@ -1332,8 +1332,8 @@ const ProfilePage: React.FC = () => {
             answer: "Essa função permite que você baixe um arquivo de planilha (CSV) com todas as contas que estão visíveis na tela, de acordo com os filtros que você aplicou. É perfeito para quem gosta de fazer análises mais detalhadas no Excel ou Google Sheets, ou simplesmente para ter um backup dos seus dados."
         },
         {
-            question: "Como gerencio ou cancelo minha assinatura?",
-            answer: "Sua assinatura é gerenciada diretamente pela Hotmart, garantindo total segurança. Para alterar seu plano, atualizar o pagamento ou cancelar, você pode acessar o portal de assinantes da Hotmart."
+            question: "Como renovo minha assinatura?",
+            answer: "Após a data de vencimento, o aplicativo exibirá a tela de planos para que você possa renovar. Para garantir que você não perca nenhuma informação já cadastrada, basta escolher um novo plano e fazer a assinatura usando o mesmo e-mail da compra anterior. Se sua assinatura tiver renovação automática, nenhuma ação é necessária."
         },
         {
             question: "Como crio minhas próprias categorias?",
