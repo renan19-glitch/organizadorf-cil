@@ -11,7 +11,6 @@ import {
     HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon, HotmartWordmark, AccordionItem
 } from './components';
 import SubscribePage from '@/src/pages/SubscribePage';
-import { scheduleBillNotifications } from '@/src/notifications';
 
 const translateSupabaseError = (message?: string): string => {
     if (!message) return 'Ocorreu um erro desconhecido.';
@@ -153,12 +152,6 @@ const BillsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
         fetchBills();
     }, [user]);
-
-    useEffect(() => {
-        if (user && bills.length > 0) {
-            scheduleBillNotifications(bills);
-        }
-    }, [bills, user]);
 
     const addBill = async (billData: Omit<Bill, 'id' | 'isPaid'>) => {
         if (!user) return;
