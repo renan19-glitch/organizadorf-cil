@@ -1314,6 +1314,25 @@ const ProfilePage: React.FC = () => {
         }
     };
 
+    const faqItems = [
+        {
+            question: "Como crio minha senha pela primeira vez?",
+            answer: "Se você comprou pela Hotmart, seu acesso é criado automaticamente. Para definir sua senha, vá para a tela de login, clique em 'Esqueceu sua senha?' e digite o mesmo e-mail que usou na compra. Você receberá um link para criar sua senha de acesso."
+        },
+        {
+            question: "O que é uma conta 'Recorrente'?",
+            answer: "Uma conta recorrente é aquela que se repete todo mês, como aluguel ou mensalidade. Ao marcar uma conta como 'Paga', o PagueFácil cria automaticamente a mesma conta para o mês seguinte, poupando seu tempo!"
+        },
+        {
+            question: "Como gerencio ou cancelo minha assinatura?",
+            answer: "Sua assinatura é gerenciada diretamente pela Hotmart, garantindo total segurança. Para alterar seu plano, atualizar o pagamento ou cancelar, você pode acessar o portal de assinantes da Hotmart."
+        },
+        {
+            question: "Como crio minhas próprias categorias?",
+            answer: "É fácil! Aqui mesmo na página de 'Meu Perfil', na seção 'Minhas Categorias', você pode adicionar novos nomes de categorias (como 'Pets' ou 'Investimentos') e excluir as que não usa. Elas aparecerão automaticamente ao adicionar ou editar uma conta."
+        }
+    ];
+
     return (
         <div>
             <Header title="Meu Perfil" />
@@ -1383,6 +1402,16 @@ const ProfilePage: React.FC = () => {
                     </div>
                 </Section>
             </form>
+
+            <Section icon={<ChatBubbleIcon className="h-7 w-7" />} title="Tire Suas Dúvidas">
+                <div className="divide-y divide-slate-200">
+                    {faqItems.map((item, index) => (
+                        <AccordionItem key={index} title={item.question}>
+                            <p>{item.answer}</p>
+                        </AccordionItem>
+                    ))}
+                </div>
+            </Section>
 
             <div className="mt-8">
                 <button 
