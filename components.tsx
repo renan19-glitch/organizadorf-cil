@@ -451,11 +451,11 @@ export const BillItem: React.FC<BillItemProps> = ({ bill, onTogglePaid, onEdit, 
       <div className="flex items-center flex-grow cursor-pointer" onClick={() => onViewDetails(bill)}>
         <div className={`w-2 h-16 rounded-full ${statusInfo[status].color} mr-4 flex-shrink-0`}></div>
         <div className="flex-grow">
-          <div className="flex items-center">
+          <div className="flex items-center flex-wrap gap-x-2 gap-y-1">
             <p className={`font-bold text-lg ${bill.isPaid ? 'line-through text-slate-500' : 'text-slate-800'}`}>{bill.name}</p>
-            {bill.isRecurring && <span className="ml-2 text-xs font-semibold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full">Recorrente</span>}
+            {bill.isRecurring && <span className="text-xs font-semibold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded-full">Recorrente</span>}
           </div>
-          <p className="text-slate-600 font-semibold">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bill.value)}</p>
+          <p className="text-slate-600 font-semibold mt-1">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(bill.value)}</p>
           <div className="flex items-center text-sm text-slate-500 mt-1">
             <CalendarIcon className="h-4 w-4 mr-1.5" />
             <span>Venc. {new Date(bill.dueDate).toLocaleDateString('pt-BR')}</span>
