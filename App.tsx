@@ -8,7 +8,7 @@ import { supabaseService } from './services';
 import { useAuth, useBills, useCategories } from './hooks';
 import { AuthContext, BillsContext, CategoriesContext } from './contexts';
 import {
-    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon, HotmartWordmark, AccordionItem, CalculatorIcon, TrophyIcon, ChatBubbleIcon, SparklesIcon, TrashIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, ChevronLeftIcon, ChevronRightIcon
+    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon, HotmartWordmark, AccordionItem, CalculatorIcon, TrophyIcon, ChatBubbleIcon, SparklesIcon, TrashIcon, ArrowTrendingUpIcon, ArrowTrendingDownIcon, ChevronLeftIcon, ChevronRightIcon, ArrowDownTrayIcon
 } from './components';
 import SubscribePage from '@/src/pages/SubscribePage';
 
@@ -369,9 +369,10 @@ const ProtectedRoute: React.FC = () => {
     return <Outlet />;
 };
 
-const Header: React.FC<{title: string}> = ({title}) => (
-    <header className="mb-8">
+const Header: React.FC<{title: string, children?: React.ReactNode}> = ({title, children}) => (
+    <header className="mb-8 flex justify-between items-center">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">{title}</h1>
+        {children}
     </header>
 );
 
@@ -863,9 +864,49 @@ const BillsListPage: React.FC = () => {
             return 0;
         });
 
+    const handleExportCSV = () => {
+        if (sortedAndFilteredBills.length === 0) {
+            alert("Não há contas para exportar com os filtros atuais.");
+            return;
+        }
+
+        const headers = ['Nome', 'Valor', 'Vencimento', 'Categoria', 'Observações', 'Pago', 'Recorrente'];
+        const rows = sortedAndFilteredBills.map(bill => [
+            `"${bill.name.replace(/"/g, '""')}"`,
+            bill.value.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            new Date(bill.dueDate).toLocaleDateString('pt-BR'),
+            `"${bill.category.replace(/"/g, '""')}"`,
+            `"${(bill.observations || '').replace(/"/g, '""')}"`,
+            bill.isPaid ? 'Sim' : 'Não',
+            bill.isRecurring ? 'Sim' : 'Não'
+        ].join(','));
+
+        const csvContent = "\uFEFF" + [headers.join(','), ...rows].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", "contas_paguefacil.csv");
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
     return (
         <div>
-            <Header title="Minhas Contas" />
+            <Header title="Minhas Contas">
+                <button 
+                    onClick={handleExportCSV}
+                    disabled={sortedAndFilteredBills.length === 0}
+                    className="flex items-center gap-2 text-sm font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg px-3 py-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <ArrowDownTrayIcon className="h-5 w-5" />
+                    <span className="hidden sm:inline">Exportar CSV</span>
+                </button>
+            </Header>
             <div className="mb-6 space-y-4 p-4 bg-slate-50 rounded-lg border border-slate-200/80">
                 <div className="grid grid-cols-3 gap-2">
                     <button onClick={() => setStatusFilter('all')} className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${statusFilter === 'all' ? 'bg-indigo-600 text-white shadow' : 'bg-white text-slate-700 hover:bg-slate-100 border'}`}>Todas</button>
