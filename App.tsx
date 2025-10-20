@@ -422,7 +422,7 @@ const ForgotPasswordPage: React.FC = () => {
                         Recuperar Senha
                     </h2>
                     <p className="text-center text-slate-600 mb-6 text-sm">
-                        Digite seu e-mail para receber um link de recuperação.
+                        Digite seu e-mail <strong>de compra pela Hotmart</strong> para receber um link de recuperação.
                     </p>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <Input 
