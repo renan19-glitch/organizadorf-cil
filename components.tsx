@@ -132,6 +132,29 @@ const ChevronDownIcon = ({ className }: { className?: string }) => (
     </svg>
 );
 
+export const CalculatorIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className || "w-6 h-6"}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 15.75V18m-7.5-6.75h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm0 2.25h.008v.008H8.25v-.008zm2.25-4.5h.008v.008H10.5v-.008zm0 2.25h.008v.008H10.5v-.008zm0 2.25h.008v.008H10.5v-.008zm2.25-4.5h.008v.008H12.75v-.008zm0 2.25h.008v.008H12.75v-.008zm0 2.25h.008v.008H12.75v-.008zM6 18.75h12A2.25 2.25 0 0020.25 16.5V7.5A2.25 2.25 0 0018 5.25H6A2.25 2.25 0 003.75 7.5v9A2.25 2.25 0 006 18.75z" />
+    </svg>
+);
+
+export const TrophyIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className || "w-6 h-6"}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-6.75c-.621 0-1.125.504-1.125 1.125v3.375m9 0h1.5a.75.75 0 00.75-.75V9.75a3 3 0 00-3-3h-1.5m-9 0h-1.5a3 3 0 00-3 3v8.25c0 .414.336.75.75.75h1.5m9 0a3 3 0 00-3-3h-3a3 3 0 00-3 3m9 0a3 3 0 01-3 3h-3a3 3 0 01-3-3m0 0c0-1.123.446-2.135 1.172-2.862m7.656 0c.726.727 1.172 1.739 1.172 2.862" />
+    </svg>
+);
+
+export const ChatBubbleIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className || "w-6 h-6"}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193l-3.721.286c-.49.038-.956.24-1.32.57l-2.513 2.219a.75.75 0 01-1.06 0l-2.513-2.219a2.25 2.25 0 00-1.32-.57l-3.721-.286A2.25 2.25 0 013.75 15.5v-4.286c0-.97.616-1.813 1.5-2.097m15 0c0-1.136-.847-2.1-1.98-2.193l-3.721-.286a2.25 2.25 0 00-1.32.57l-2.513 2.219a.75.75 0 01-1.06 0l-2.513-2.219a2.25 2.25 0 00-1.32-.57l-3.721.286A2.25 2.25 0 003.75 6.5v4.286" />
+    </svg>
+);
+
+export const SparklesIcon = ({ className }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={className || "w-6 h-6"}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.452-2.452L14.25 6l1.036-.259a3.375 3.375 0 002.452-2.452L18 2.25l.259 1.035a3.375 3.375 0 002.452 2.452L21.75 6l-1.035.259a3.375 3.375 0 00-2.452 2.452zM12 18.75a.75.75 0 01.75.75v.008a.75.75 0 01-1.5 0v-.008a.75.75 0 01.75-.75z" />
+    </svg>
+);
 
 // --- UI COMPONENTS ---
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {

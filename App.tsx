@@ -8,7 +8,7 @@ import { supabaseService } from './services';
 import { useAuth, useBills } from './hooks';
 import { AuthContext, BillsContext } from './contexts';
 import {
-    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon, HotmartWordmark, AccordionItem
+    HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon, HotmartWordmark, AccordionItem, CalculatorIcon, TrophyIcon, ChatBubbleIcon, SparklesIcon
 } from './components';
 import SubscribePage from '@/src/pages/SubscribePage';
 
@@ -511,6 +511,7 @@ const UpdatePasswordPage: React.FC = () => {
 const HomePage: React.FC = () => {
     const { user } = useAuth();
     const { bills, loading } = useBills();
+    const [selectedArticle, setSelectedArticle] = useState<{ title: string; content: React.ReactNode; icon: React.ReactNode } | null>(null);
 
     if (loading) return <Spinner />;
 
@@ -557,35 +558,83 @@ const HomePage: React.FC = () => {
 
     const educationalContent = [
         {
-            title: "Por que usar o PagueFácil todos os dias?",
+            icon: <TrendingUpIcon className="h-8 w-8" />,
+            title: "Hábito Diário",
             content: (
-                <p>
-                    Criar o hábito de abrir o aplicativo diariamente, mesmo que por um minuto, te mantém no controle total de suas finanças. Você visualiza rapidamente o que está por vir, evita surpresas e fortalece sua disciplina financeira.
-                </p>
+                <div className="space-y-3 text-slate-600">
+                    <h3 className="font-bold text-lg text-slate-800">Por que usar o PagueFácil todos os dias?</h3>
+                    <p>Criar o hábito de abrir o aplicativo diariamente, mesmo que por um minuto, te mantém no controle total de suas finanças. Você visualiza rapidamente o que está por vir, evita surpresas e fortalece sua disciplina financeira. É um pequeno passo que gera um grande impacto no seu bem-estar financeiro.</p>
+                </div>
             )
         },
         {
-            title: "Dica de Ouro: Como evitar multas por atraso",
+            icon: <SparklesIcon className="h-8 w-8" />,
+            title: "Dica de Ouro",
             content: (
-                <p>
-                    A melhor forma de evitar multas é a antecipação. Use a função de "Observações" para adicionar lembretes, como "Pagar 2 dias antes". Fique de olho também nos alertas de vencimento na tela inicial; eles são seus maiores aliados para não perder nenhum prazo.
-                </p>
+                <div className="space-y-3 text-slate-600">
+                    <h3 className="font-bold text-lg text-slate-800">Como evitar multas por atraso</h3>
+                    <p>A melhor forma de evitar multas é a antecipação. Use a função de "Observações" para adicionar lembretes, como "Pagar 2 dias antes". Fique de olho também nos alertas de vencimento na tela inicial; eles são seus maiores aliados para não perder nenhum prazo.</p>
+                </div>
             )
         },
         {
-            title: "Você Sabia? O impacto dos atrasos no seu bolso",
+            icon: <CalculatorIcon className="h-8 w-8" />,
+            title: "Orçamento",
             content: (
-                <p>
-                    Estudos mostram que uma família média pode gastar centenas de reais por ano apenas com multas e juros por atraso de contas. Usar uma ferramenta como o PagueFácil não é apenas sobre organização, é sobre economizar dinheiro de verdade.
-                </p>
+                <div className="space-y-3 text-slate-600">
+                    <h3 className="font-bold text-lg text-slate-800">Criando seu Orçamento</h3>
+                    <p>Use a aba "Contas" para ter uma visão clara de todas as suas despesas mensais. Some os valores para saber o total de seus compromissos. Isso te ajuda a entender para onde seu dinheiro está indo e a planejar seus gastos com mais inteligência.</p>
+                </div>
             )
         },
         {
-            title: "Entendendo os Alertas de Vencimento",
+            icon: <BellIcon className="h-8 w-8" />,
+            title: "Alertas Visuais",
             content: (
-                <p>
-                    Nossos alertas coloridos não são apenas estéticos. O <strong className="text-yellow-600">amarelo</strong> significa "Atenção, vence hoje!", enquanto o <strong className="text-red-600">vermelho</strong> é um sinal de "Urgente, conta vencida!". Prestar atenção a essas cores te ajuda a priorizar seus pagamentos.
-                </p>
+                <div className="space-y-3 text-slate-600">
+                    <h3 className="font-bold text-lg text-slate-800">Entendendo os Alertas</h3>
+                    <p>Nossos alertas coloridos não são apenas estéticos. O <strong className="text-yellow-600">amarelo</strong> significa "Atenção, vence hoje!", enquanto o <strong className="text-red-600">vermelho</strong> é um sinal de "Urgente, conta vencida!". Prestar atenção a essas cores te ajuda a priorizar seus pagamentos.</p>
+                </div>
+            )
+        },
+        {
+            icon: <CheckCircleIcon className="h-8 w-8" />,
+            title: "Pagamento Antecipado",
+            content: (
+                <div className="space-y-3 text-slate-600">
+                    <h3 className="font-bold text-lg text-slate-800">O Poder de Pagar Adiantado</h3>
+                    <p>Pagar uma conta alguns dias antes do vencimento não só evita multas, mas também traz uma enorme paz de espírito. Marcar uma conta como "Paga" no app libera sua mente para focar em outras coisas, sabendo que suas obrigações estão em ordem.</p>
+                </div>
+            )
+        },
+        {
+            icon: <ChatBubbleIcon className="h-8 w-8" />,
+            title: "Negociando Contas",
+            content: (
+                <div className="space-y-3 text-slate-600">
+                    <h3 className="font-bold text-lg text-slate-800">Dica para Economizar</h3>
+                    <p>Você sabia que muitas contas, como internet e telefone, podem ser negociadas? A cada 6 ou 12 meses, ligue para a operadora e pergunte sobre novas promoções. Muitas vezes, você consegue um plano melhor pelo mesmo preço ou até mais barato!</p>
+                </div>
+            )
+        },
+        {
+            icon: <TrophyIcon className="h-8 w-8" />,
+            title: "Metas Financeiras",
+            content: (
+                <div className="space-y-3 text-slate-600">
+                    <h3 className="font-bold text-lg text-slate-800">Além das Contas</h3>
+                    <p>Manter suas contas organizadas é o primeiro passo para alcançar metas maiores. Quando você sabe exatamente quanto gasta, fica mais fácil definir objetivos, como guardar dinheiro para uma viagem, um curso ou para a entrada de um imóvel. A organização é a base do sucesso financeiro!</p>
+                </div>
+            )
+        },
+        {
+            icon: <ShieldCheckIcon className="h-8 w-8" />,
+            title: "Segurança",
+            content: (
+                <div className="space-y-3 text-slate-600">
+                    <h3 className="font-bold text-lg text-slate-800">Impacto no seu Bolso</h3>
+                    <p>Estudos mostram que uma família média pode gastar centenas de reais por ano apenas com multas e juros por atraso de contas. Usar uma ferramenta como o PagueFácil não é apenas sobre organização, é sobre economizar dinheiro de verdade e proteger sua saúde financeira.</p>
+                </div>
             )
         }
     ];
@@ -604,15 +653,37 @@ const HomePage: React.FC = () => {
             </div>
 
             <div className="mt-10">
-                <h2 className="text-2xl font-bold text-slate-800 mb-2">Central de Educação Financeira</h2>
-                <Card className="p-2 sm:p-4">
+                <h2 className="text-2xl font-bold text-slate-800 mb-1">Central de Educação Financeira</h2>
+                <p className="text-slate-500 mb-4">Toque em um tópico para aprender mais.</p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {educationalContent.map((item, index) => (
-                        <AccordionItem key={index} title={item.title}>
-                            {item.content}
-                        </AccordionItem>
+                        <button key={index} onClick={() => setSelectedArticle(item)} className="text-left focus:outline-none focus:ring-2 focus:ring-indigo-400 rounded-xl">
+                            <Card className="h-full flex flex-col items-center justify-center text-center p-4 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
+                                <div className="p-3 bg-indigo-100 rounded-full mb-3 text-indigo-600">
+                                    {item.icon}
+                                </div>
+                                <h3 className="font-bold text-slate-800 text-sm">{item.title}</h3>
+                            </Card>
+                        </button>
                     ))}
-                </Card>
+                </div>
             </div>
+
+            <Modal isOpen={!!selectedArticle} onClose={() => setSelectedArticle(null)} title={selectedArticle?.title || ''}>
+                {selectedArticle && (
+                    <div className="space-y-4">
+                        <div className="flex justify-center text-indigo-500">
+                            {React.cloneElement(selectedArticle.icon, { className: "h-12 w-12" })}
+                        </div>
+                        <div>{selectedArticle.content}</div>
+                        <div className="flex justify-end pt-2">
+                            <Button variant="secondary" onClick={() => setSelectedArticle(null)}>
+                                Entendi
+                            </Button>
+                        </div>
+                    </div>
+                )}
+            </Modal>
         </div>
     );
 };
