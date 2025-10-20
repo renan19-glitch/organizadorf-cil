@@ -1320,14 +1320,6 @@ const ProfilePage: React.FC = () => {
             answer: "Se você comprou pela Hotmart, seu acesso é criado automaticamente. Para definir sua senha, vá para a tela de login, clique em 'Esqueceu sua senha?' e digite o mesmo e-mail que usou na compra. Você receberá um link para criar sua senha de acesso."
         },
         {
-            question: "Fiz o pagamento na Hotmart, mas o app ainda pede para assinar. O que faço?",
-            answer: "Às vezes, a confirmação da Hotmart pode levar alguns minutos. Tente sair e entrar novamente no aplicativo. Se o problema persistir após 15 minutos, por favor, entre em contato com nosso suporte informando o e-mail da sua compra."
-        },
-        {
-            question: "O botão 'Pagar' quita minha dívida de verdade no banco?",
-            answer: "Não. O PagueFácil é um organizador. O botão 'Pagar' serve para você marcar a conta como paga *dentro do aplicativo* e manter seu controle financeiro em dia. O pagamento real da sua conta ainda precisa ser feito no seu banco ou casa lotérica."
-        },
-        {
             question: "O que é uma conta 'Recorrente'?",
             answer: "Uma conta recorrente é aquela que se repete todo mês, como aluguel ou mensalidade. Ao marcar uma conta como 'Paga', o PagueFácil cria automaticamente a mesma conta para o mês seguinte, poupando seu tempo!"
         },
