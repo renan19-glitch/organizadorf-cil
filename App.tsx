@@ -1403,7 +1403,7 @@ const ProfilePage: React.FC = () => {
                 </Section>
             </form>
 
-            <Section icon={<ChatBubbleIcon className="h-7 w-7" />} title="Tire Suas Dúvidas">
+            <Section icon={<SparklesIcon className="h-7 w-7" />} title="Tire Suas Dúvidas">
                 <div className="divide-y divide-slate-200">
                     {faqItems.map((item, index) => (
                         <AccordionItem key={index} title={item.question}>
