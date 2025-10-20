@@ -227,14 +227,17 @@ const BillsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     };
 
     const updateBill = async (updatedBill: Bill) => {
-        const { id, dueDate, isPaid, isRecurring, ...restOfBillData } = updatedBill;
+        const { id, name, value, dueDate, category, observations, isPaid, isRecurring } = updatedBill;
         const updatePayload = {
-            ...restOfBillData,
+            name,
+            value,
+            category,
+            observations,
             due_date: dueDate.toISOString().split('T')[0],
             is_paid: isPaid,
             is_recurring: isRecurring,
         };
-
+    
         const { data: returnedBill, error } = await supabaseService.updateBill(id, updatePayload);
         if (error) {
             console.error('Error updating bill:', error);
