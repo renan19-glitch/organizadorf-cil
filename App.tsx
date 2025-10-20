@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation, Navigate, Outlet, useParams, useSearchParams } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { supabase } from './src/integrations/supabase/client';
+import { supabase } from '@/src/integrations/supabase/client';
 import type { User, Bill } from './types';
 import { supabaseService } from './services';
 import { useAuth, useBills } from './hooks';
@@ -10,8 +10,8 @@ import { AuthContext, BillsContext } from './contexts';
 import {
     HomeIcon, DocumentTextIcon, StarIcon, UserCircleIcon, Button, Input, Card, Modal, Spinner, SummaryCard, BillItem, PlusIcon, Textarea, Select, Logo, ClockIcon, CalendarIcon, TrendingUpIcon, ShieldCheckIcon, BellIcon, ArrowRightOnRectangleIcon, ToggleSwitch, NotificationBanner, AnimatedBellIcon, CheckCircleIcon, HotmartIcon, HotmartWordmark, AccordionItem
 } from './components';
-import SubscribePage from './src/pages/SubscribePage';
-import { scheduleBillNotifications } from './src/notifications';
+import SubscribePage from '@/src/pages/SubscribePage';
+import { scheduleBillNotifications } from '@/src/notifications';
 
 const translateSupabaseError = (message?: string): string => {
     if (!message) return 'Ocorreu um erro desconhecido.';
