@@ -880,9 +880,15 @@ const BillsListPage: React.FC = () => {
                                 <p className="font-semibold text-lg">{new Date(billToView.dueDate).toLocaleDateString('pt-BR')}</p>
                             </div>
                         </div>
-                        <div>
-                            <p className="text-xs text-slate-500">Categoria</p>
-                            <p className="font-semibold text-lg">{billToView.category}</p>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <p className="text-xs text-slate-500">Categoria</p>
+                                <p className="font-semibold text-lg">{billToView.category}</p>
+                            </div>
+                            <div>
+                                <p className="text-xs text-slate-500">Tipo</p>
+                                <p className="font-semibold text-lg">{billToView.isRecurring ? 'Recorrente' : 'Única'}</p>
+                            </div>
                         </div>
                         {billToView.observations && (
                             <div>
