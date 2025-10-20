@@ -402,12 +402,12 @@ const ForgotPasswordPage: React.FC = () => {
         setLoading(true);
         setMessage('');
         setIsError(false);
-        const { error } = await supabaseService.resetPasswordWithTemporary(email);
+        const { error } = await supabaseService.sendPasswordResetEmail(email);
         if (error) {
             setMessage(translateSupabaseError(error.message));
             setIsError(true);
         } else {
-            setMessage("Se uma conta com este e-mail existir, sua senha foi redefinida para 'pague123'. Faça o login para continuar.");
+            setMessage("Se uma conta com este e-mail existir, um link para redefinição de senha foi enviado. Por favor, verifique sua caixa de entrada.");
             setIsError(false);
         }
         setLoading(false);
@@ -422,7 +422,7 @@ const ForgotPasswordPage: React.FC = () => {
                         Recuperar Senha
                     </h2>
                     <p className="text-center text-slate-600 mb-6 text-sm">
-                        Digite seu e-mail para redefinir sua senha para o padrão.
+                        Digite seu e-mail para receber um link de recuperação.
                     </p>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <Input 
@@ -433,7 +433,7 @@ const ForgotPasswordPage: React.FC = () => {
                             required 
                         />
                         <Button type="submit" disabled={loading}>
-                            {loading ? 'Redefinindo...' : 'Redefinir Senha'}
+                            {loading ? 'Enviando...' : 'Enviar Link de Recuperação'}
                         </Button>
                     </form>
                     {message && <p className={`mt-4 text-center text-sm ${isError ? 'text-red-600' : 'text-green-600'}`}>{message}</p>}

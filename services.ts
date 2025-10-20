@@ -19,9 +19,10 @@ export const supabaseService = {
         body: { password },
     });
   },
-  resetPasswordWithTemporary: (email: string) => {
-    return supabase.functions.invoke('reset-password-temp', {
-        body: { email },
+  sendPasswordResetEmail: (email: string) => {
+    const redirectUrl = `${window.location.origin}/update-password`;
+    return supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: redirectUrl,
     });
   },
   
