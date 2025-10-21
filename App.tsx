@@ -40,67 +40,64 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     const [loading, setLoading] = useState(true);
     const location = useLocation();
 
-    useEffect(() => {
-        const checkSessionAndSetUser = async () => {
-            const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const checkSessionAndSetUser = useCallback(async () => {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-            if (sessionError) {
-                console.error("Error getting session:", sessionError);
-                setUser(null);
-                setLoading(false);
-                return;
-            }
-
-            if (session) {
-                const { data: profile, error: profileError } = await supabaseService.getProfile(session.user.id);
-
-                if (profileError || !profile) {
-                    console.warn("User has session but no profile. Signing out.", profileError);
-                    await supabaseService.signOut();
-                    setUser(null);
-                } else {
-                    setUser({
-                        id: session.user.id,
-                        email: session.user.email!,
-                        name: profile.name,
-                        subscription_status: profile.subscription_status,
-                        plan_name: profile.plan_name,
-                        next_billing_date: profile.next_billing_date,
-                        subscriber_id: profile.subscriber_id,
-                    });
-                }
-            } else {
-                setUser(null);
-            }
-            
+        if (sessionError) {
+            console.error("Error getting session:", sessionError);
+            setUser(null);
             setLoading(false);
-        };
+            return;
+        }
+
+        if (session) {
+            const { data: profile, error: profileError } = await supabaseService.getProfile(session.user.id);
+
+            if (profileError || !profile) {
+                console.warn("User has session but no profile. Signing out.", profileError);
+                await supabaseService.signOut();
+                setUser(null);
+            } else {
+                setUser({
+                    id: session.user.id,
+                    email: session.user.email!,
+                    name: profile.name,
+                    subscription_status: profile.subscription_status,
+                    plan_name: profile.plan_name,
+                    next_billing_date: profile.next_billing_date,
+                    subscriber_id: profile.subscriber_id,
+                });
+            }
+        } else {
+            setUser(null);
+        }
+        
+        setLoading(false);
+    }, []);
+
+    useEffect(() => {
+        if (location.pathname !== '/update-password') {
+            checkSessionAndSetUser();
+        } else {
+            setLoading(false);
+        }
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            // When the user is on the password recovery page, a special session is created.
-            // We want to prevent our global logic from running and interfering with the password update form.
             if (location.pathname === '/update-password') {
                 return;
             }
 
-            if (event === 'SIGNED_OUT') {
-                setUser(null);
-            } else if (session) {
+            if (event === 'SIGNED_IN') {
                 checkSessionAndSetUser();
+            } else if (event === 'SIGNED_OUT') {
+                setUser(null);
             }
         });
-
-        // Also, we need to run the initial check only if not on the update password page.
-        if (location.pathname !== '/update-password') {
-            checkSessionAndSetUser();
-        } else {
-            setLoading(false); // If on the page, just stop loading.
-        }
 
         return () => {
             subscription.unsubscribe();
         };
-    }, [location.pathname]);
+    }, [location.pathname, checkSessionAndSetUser]);
 
     const updateUser = async (updatedFields: Partial<User>) => {
         if (user) {
