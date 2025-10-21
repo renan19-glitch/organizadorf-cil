@@ -703,7 +703,10 @@ const HomePage: React.FC = () => {
             <div className="mt-10">
                 <div className="flex justify-between items-center mb-4">
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-800 mb-1">Análise Financeira</h2>
+                        <div className="flex items-center gap-3 mb-1">
+                            <CalculatorIcon className="h-7 w-7 text-indigo-600" />
+                            <h2 className="text-2xl font-bold text-slate-800">Análise Financeira</h2>
+                        </div>
                         <p className="text-slate-500">Veja um resumo dos seus gastos e tendências.</p>
                     </div>
                 </div>
