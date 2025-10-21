@@ -38,6 +38,7 @@ const translateSupabaseError = (message?: string): string => {
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const location = useLocation();
 
     useEffect(() => {
         const checkSessionAndSetUser = async () => {
@@ -75,9 +76,13 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             setLoading(false);
         };
 
-        checkSessionAndSetUser();
-
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            // When the user is on the password recovery page, a special session is created.
+            // We want to prevent our global logic from running and interfering with the password update form.
+            if (location.pathname === '/update-password') {
+                return;
+            }
+
             if (event === 'SIGNED_OUT') {
                 setUser(null);
             } else if (session) {
@@ -85,10 +90,17 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
             }
         });
 
+        // Also, we need to run the initial check only if not on the update password page.
+        if (location.pathname !== '/update-password') {
+            checkSessionAndSetUser();
+        } else {
+            setLoading(false); // If on the page, just stop loading.
+        }
+
         return () => {
             subscription.unsubscribe();
         };
-    }, []);
+    }, [location.pathname]);
 
     const updateUser = async (updatedFields: Partial<User>) => {
         if (user) {
