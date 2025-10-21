@@ -20,7 +20,9 @@ export const supabaseService = {
     });
   },
   sendPasswordResetEmail: (email: string) => {
-    const redirectUrl = `${window.location.origin}/update-password`;
+    // Use an environment variable for the site URL in production, fallback to localhost for development
+    const siteUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
+    const redirectUrl = `${siteUrl}/update-password`;
     return supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
     });
