@@ -38,7 +38,6 @@ const translateSupabaseError = (message?: string): string => {
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
-    const location = useLocation();
 
     const checkSessionAndSetUser = useCallback(async () => {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -76,28 +75,21 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     }, []);
 
     useEffect(() => {
-        if (location.pathname !== '/update-password') {
-            checkSessionAndSetUser();
-        } else {
-            setLoading(false);
-        }
+        checkSessionAndSetUser();
 
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-            if (location.pathname === '/update-password') {
-                return;
-            }
-
             if (event === 'SIGNED_IN') {
                 checkSessionAndSetUser();
             } else if (event === 'SIGNED_OUT') {
                 setUser(null);
             }
+            // We intentionally ignore other events like USER_UPDATED to prevent re-login loops.
         });
 
         return () => {
             subscription.unsubscribe();
         };
-    }, [location.pathname, checkSessionAndSetUser]);
+    }, [checkSessionAndSetUser]);
 
     const updateUser = async (updatedFields: Partial<User>) => {
         if (user) {
@@ -539,8 +531,10 @@ const UpdatePasswordPage: React.FC = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
             if (event === 'USER_UPDATED') {
+                // After password update, Supabase creates a session. We must sign out immediately.
+                await supabase.auth.signOut();
                 navigate('/login?message=password-updated', { replace: true });
             }
         });
